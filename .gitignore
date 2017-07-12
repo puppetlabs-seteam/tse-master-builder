@@ -1,0 +1,6 @@
+packer_cache/*
+output-*
+Gemfile.lock
+junit
+log
+.vagrant

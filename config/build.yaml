@@ -1,0 +1,5 @@
+---
+s3publish: true
+builds:
+  - virtualbox
+  - vmware

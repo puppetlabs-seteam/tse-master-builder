@@ -1,0 +1,12 @@
+HOSTS:
+  master.inf.puppet.vm:
+    roles:
+      - master
+    platform: el-7-x86_64
+    box: packer_virtualbox
+    hypervisor: vagrant
+    vagrant_memsize: 8096
+    vagrant_cpus: 2
+CONFIG:
+  log_level: info
+  type: foss

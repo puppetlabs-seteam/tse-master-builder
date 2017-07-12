@@ -1,0 +1,17 @@
+HOSTS:
+  master.inf.puppet.vm:
+    roles:
+      - master
+    platform: el-7-x86_64
+    hypervisor: vcloud
+    user: root
+CONFIG:
+  ssh:
+    user: root
+    password: puppetlabs
+    auth_methods: ["password"]
+  type: aio
+  datastore: persistent1
+  folder: TSEs/testing
+  datacenter: west1
+  dot_fog: 'fog'
