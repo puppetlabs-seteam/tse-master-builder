@@ -206,7 +206,6 @@ stage("Build and Test"){
                     openstack image create \
                       --disk-format vmdk \
                       --file *.vmdk \
-                      // --public \
                       "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
                   """)
 
