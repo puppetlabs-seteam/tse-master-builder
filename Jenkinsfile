@@ -15,7 +15,7 @@ stage("Setup") {
     // Store build configuration in config var (map)
     // keys: download_version (string), ga_release=(bool), pe_dist=(string), pe_release=(int), pe_arch=(string)
     //       git_remote=(string, optional), public_key=(string, optional), priv_key=(string, optional)
-    //       s3publish=(bool)
+    //       publish_images=(bool)
     config = loadConfig(readFile('config/default.yaml')) + loadConfig(readFile('config/build.yaml'))
     config['ga_release'] = config['ga_release'] == true ? 1 : 0
 
@@ -193,16 +193,6 @@ stage("Build and Test"){
               }
 
               stage ("Upload"){
-                //Publish Openstack Images
-                sh("""
-                  openstack image create \
-                    --disk-format vmdk \
-                    --file *.vmdk \
-                    // --public \
-                    "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
-                """)
-
-                // Publish OVA/BOX Files
                 sh 'mkdir commits releases'
 
                 if (buildType == 'commit') {
@@ -211,8 +201,14 @@ stage("Build and Test"){
                   sh 'find . -name "*.box" -o -name "*.ova" | xargs -I {} mv {} releases/'
                 }
 
-
-                if (config['s3publish'] != false) {
+                if (config['publish_images'] != false) {
+                  sh("""
+                    openstack image create \
+                      --disk-format vmdk \
+                      --file *.vmdk \
+                      // --public \
+                      "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
+                  """)
 
                   step([$class: 'S3BucketPublisher',
                     consoleLogLevel: 'INFO',

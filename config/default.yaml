@@ -7,7 +7,7 @@ pe_arch: x86_64
 git_remote: 'https://github.com/puppetlabs-seteam/control-repo.git'
 public_key:
 priv_key:
-s3publish: true
+publish_images: true
 vmware_network: 'VM Network'
 vmware_datastore: 'persistent1'
 builds:
