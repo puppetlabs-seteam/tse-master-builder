@@ -37,6 +37,12 @@ stage("Build and Test"){
 
       node ("tse-master-builder-${config['builds'][index]}") {
 
+export OS_AUTH_URL=http://localhost:5000/v3
+$ export OS_DEFAULT_DOMAIN=default
+$ export OS_USERNAME=admin
+$ export OS_PASSWORD=secret
+$ export OS_PROJECT_NAME=admin
+
         try {
           withCredentials(
             [
@@ -46,6 +52,9 @@ stage("Build and Test"){
               usernamePassword(credentialsId: 'vsphere_userpass', passwordVariable: 'vmware_pass', usernameVariable: 'vmware_user'),
               string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
               string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter')
+              string(credentialsId: 'puppetlabs-seteam-openstack-auth-url', variable: 'openstack_authurl')
+              string(credentialsId: 'puppetlabs-seteam-openstack-tenant', variable: 'openstack_tenant')
+              string(credentialsId: 'puppetlabs-seteam-openstack-region', variable: 'openstack_region')
             ]
           ){
             pubkey  = readFile public_key
@@ -68,7 +77,13 @@ stage("Build and Test"){
               "VMWARE_DS=${config['vmware_datastore']}",
               "VMWARE_NET=${config['vmware_network']}",
               "VMWARE_VI_CONNECTION=${vmware_vi_connection}",
-              "VMWARE_DATACENTER=${vmware_datacenter}"
+              "VMWARE_DATACENTER=${vmware_datacenter}",
+              "OS_AUTH_URL=${openstack_authurl}",
+              "OS_TENANT_NAME=${openstack_tenant}",
+              "OS_PROJECT_NAME=${openstack_tenant}",
+              "OS_USERNAME=${vmware_user}",
+              "OS_PASSWORD=${vmware_pass}",
+              "OS_REGION_NAME=${openstack_region}"
             ]){
               stage ("Build tse-master-${config['builds'][index]}") {
                 checkout scm
@@ -184,6 +199,16 @@ stage("Build and Test"){
               }
 
               stage ("Upload"){
+                //Publish Openstack Images
+                sh("""
+                  openstack image create \
+                    --disk-format vmdk \
+                    --file *.vmdk \
+                    // --public \
+                    "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
+                """)
+
+                // Publish OVA/BOX Files
                 sh 'mkdir commits releases'
 
                 if (buildType == 'commit') {
@@ -191,6 +216,7 @@ stage("Build and Test"){
                 } else if (buildType == 'release') {
                   sh 'find . -name "*.box" -o -name "*.ova" | xargs -I {} mv {} releases/'
                 }
+
 
                 if (config['s3publish'] != false) {
 
