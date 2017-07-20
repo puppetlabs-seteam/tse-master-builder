@@ -45,9 +45,9 @@ stage("Build and Test"){
               file(credentialsId: 'puppetlabs-seteam-jenkins-private_key', variable: 'private_key'),
               usernamePassword(credentialsId: 'vsphere_userpass', passwordVariable: 'vmware_pass', usernameVariable: 'vmware_user'),
               string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
-              string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter')
-              string(credentialsId: 'puppetlabs-seteam-openstack-auth-url', variable: 'openstack_authurl')
-              string(credentialsId: 'puppetlabs-seteam-openstack-tenant', variable: 'openstack_tenant')
+              string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
+              string(credentialsId: 'puppetlabs-seteam-openstack-auth-url', variable: 'openstack_authurl'),
+              string(credentialsId: 'puppetlabs-seteam-openstack-tenant', variable: 'openstack_tenant'),
               string(credentialsId: 'puppetlabs-seteam-openstack-region', variable: 'openstack_region')
             ]
           ){
