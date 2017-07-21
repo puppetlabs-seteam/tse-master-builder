@@ -2,4 +2,4 @@
 publish_images: true
 builds:
   - virtualbox
-  - vmware
+#  - vmware
