@@ -46,7 +46,8 @@ stage("Build and Test"){
             string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
             string(credentialsId: 'puppetlabs-seteam-openstack-auth-url', variable: 'openstack_authurl'),
             string(credentialsId: 'puppetlabs-seteam-openstack-tenant', variable: 'openstack_tenant'),
-            string(credentialsId: 'puppetlabs-seteam-openstack-region', variable: 'openstack_region')
+            string(credentialsId: 'puppetlabs-seteam-openstack-region', variable: 'openstack_region'),
+            string(credentialsId: 'puppetlabs-seteam-openstack-tenant_id', variable: 'openstack_tenant_id')
           ]
         ){
           pubkey  = readFile public_key
@@ -199,6 +200,7 @@ stage("Build and Test"){
                    export OS_AUTH_URL="${openstack_authurl}"
                    export OS_TENANT_NAME="${openstack_tenant}"
                    export OS_PROJECT_NAME="${openstack_tenant}"
+                   export OS_TENANT_ID="${openstack_tenant_id}"
                    export OS_USERNAME="${vmware_user}"
                    export OS_PASSWORD="${vmware_pass}"
                    export OS_REGION_NAME="${openstack_region}"
