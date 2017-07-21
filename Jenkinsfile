@@ -70,12 +70,6 @@ stage("Build and Test"){
             "VMWARE_NET=${config['vmware_network']}",
             "VMWARE_VI_CONNECTION=${vmware_vi_connection}",
             "VMWARE_DATACENTER=${vmware_datacenter}",
-            "OS_AUTH_URL=${openstack_authurl}",
-            "OS_TENANT_NAME=${openstack_tenant}",
-            "OS_PROJECT_NAME=${openstack_tenant}",
-            "OS_USERNAME=${vmware_user}",
-            "OS_PASSWORD=${vmware_pass}",
-            "OS_REGION_NAME=${openstack_region}"
           ]){
             try {
               stage ("Build tse-master-${config['builds'][index]}") {
@@ -202,6 +196,12 @@ stage("Build and Test"){
 
                 if (config['publish_images'] != false) {
                   sh("""
+                   export OS_AUTH_URL="${openstack_authurl}"
+                   export OS_TENANT_NAME="${openstack_tenant}"
+                   export OS_PROJECT_NAME="${openstack_tenant}"
+                   export OS_USERNAME="${vmware_user}"
+                   export OS_PASSWORD="${vmware_pass}"
+                   export OS_REGION_NAME="${openstack_region}"
                     openstack image create \
                       --disk-format vmdk \
                       --file *.vmdk \
