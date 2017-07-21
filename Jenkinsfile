@@ -36,49 +36,48 @@ stage("Build and Test"){
     tobuild[config['builds'][index]] = {
 
       node ("tse-master-builder-${config['builds'][index]}") {
+        withCredentials(
+          [
+            file(credentialsId: 'puppetlabs-seteam-jenkins-fog_config', variable: 'fog_config'),
+            file(credentialsId: 'puppetlabs-seteam-jenkins-public_key', variable: 'public_key'),
+            file(credentialsId: 'puppetlabs-seteam-jenkins-private_key', variable: 'private_key'),
+            usernamePassword(credentialsId: 'vsphere_userpass', passwordVariable: 'vmware_pass', usernameVariable: 'vmware_user'),
+            string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
+            string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
+            string(credentialsId: 'puppetlabs-seteam-openstack-auth-url', variable: 'openstack_authurl'),
+            string(credentialsId: 'puppetlabs-seteam-openstack-tenant', variable: 'openstack_tenant'),
+            string(credentialsId: 'puppetlabs-seteam-openstack-region', variable: 'openstack_region')
+          ]
+        ){
+          pubkey  = readFile public_key
+          privkey = readFile private_key
 
-        try {
-          withCredentials(
-            [
-              file(credentialsId: 'puppetlabs-seteam-jenkins-fog_config', variable: 'fog_config'),
-              file(credentialsId: 'puppetlabs-seteam-jenkins-public_key', variable: 'public_key'),
-              file(credentialsId: 'puppetlabs-seteam-jenkins-private_key', variable: 'private_key'),
-              usernamePassword(credentialsId: 'vsphere_userpass', passwordVariable: 'vmware_pass', usernameVariable: 'vmware_user'),
-              string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
-              string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
-              string(credentialsId: 'puppetlabs-seteam-openstack-auth-url', variable: 'openstack_authurl'),
-              string(credentialsId: 'puppetlabs-seteam-openstack-tenant', variable: 'openstack_tenant'),
-              string(credentialsId: 'puppetlabs-seteam-openstack-region', variable: 'openstack_region')
-            ]
-          ){
-            pubkey  = readFile public_key
-            privkey = readFile private_key
-
-            withEnv([
-              'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
-              "GIT_REMOTE=${config['git_remote']}",
-              "PRIV_KEY=${privkey}",
-              "PUB_KEY=${pubkey}",
-              "DOWNLOAD_VERSION=${config['download_version']}",
-              "DOWNLOAD_DIST=${config['pe_dist']}",
-              "DOWNLOAD_RELEASE=${config['pe_release']}",
-              "DOWNLOAD_ARCH=${config['pe_arch']}",
-              "DOWNLOAD_RC=${config['ga_release']}",
-              "GIT_CURRENT=${gitCurrent}",
-              "VMWARE_USER=${vmware_user}",
-              "VMWARE_PASS=${vmware_pass}",
-              "FOG_CONFIG=${fog_config}",
-              "VMWARE_DS=${config['vmware_datastore']}",
-              "VMWARE_NET=${config['vmware_network']}",
-              "VMWARE_VI_CONNECTION=${vmware_vi_connection}",
-              "VMWARE_DATACENTER=${vmware_datacenter}",
-              "OS_AUTH_URL=${openstack_authurl}",
-              "OS_TENANT_NAME=${openstack_tenant}",
-              "OS_PROJECT_NAME=${openstack_tenant}",
-              "OS_USERNAME=${vmware_user}",
-              "OS_PASSWORD=${vmware_pass}",
-              "OS_REGION_NAME=${openstack_region}"
-            ]){
+          withEnv([
+            'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
+            "GIT_REMOTE=${config['git_remote']}",
+            "PRIV_KEY=${privkey}",
+            "PUB_KEY=${pubkey}",
+            "DOWNLOAD_VERSION=${config['download_version']}",
+            "DOWNLOAD_DIST=${config['pe_dist']}",
+            "DOWNLOAD_RELEASE=${config['pe_release']}",
+            "DOWNLOAD_ARCH=${config['pe_arch']}",
+            "DOWNLOAD_RC=${config['ga_release']}",
+            "GIT_CURRENT=${gitCurrent}",
+            "VMWARE_USER=${vmware_user}",
+            "VMWARE_PASS=${vmware_pass}",
+            "FOG_CONFIG=${fog_config}",
+            "VMWARE_DS=${config['vmware_datastore']}",
+            "VMWARE_NET=${config['vmware_network']}",
+            "VMWARE_VI_CONNECTION=${vmware_vi_connection}",
+            "VMWARE_DATACENTER=${vmware_datacenter}",
+            "OS_AUTH_URL=${openstack_authurl}",
+            "OS_TENANT_NAME=${openstack_tenant}",
+            "OS_PROJECT_NAME=${openstack_tenant}",
+            "OS_USERNAME=${vmware_user}",
+            "OS_PASSWORD=${vmware_pass}",
+            "OS_REGION_NAME=${openstack_region}"
+          ]){
+            try {
               stage ("Build tse-master-${config['builds'][index]}") {
                 checkout scm
                 checkout([
@@ -256,35 +255,35 @@ stage("Build and Test"){
                 step([$class: 'WsCleanup'])
               }
 
+            } catch (error) {
+              stage("Failure Cleanup") {
+                step([$class: 'WsCleanup'])
+                description = description + "Build ${config['builds'][index]} failed.  No artifacts for ${config['builds'][index]} uploaded."
+
+                //Cleanup any deployed artifacts
+                if (config['builds'][index] == 'virtualbox') {
+
+                  sh(returnStatus: true, script:'vagrant box remove packer_virtualbox')
+
+                } else if (config['builds'][index] == 'vmware') {
+
+                  sh(returnStatus: true, script:"""
+                    rbenv global 2.3.1
+                    eval "\$(rbenv init -)"
+                    gem install bundler --version 1.10.6
+                    bundle install
+                    datacenter=\"${VMWARE_DATACENTER}\" fog_config=fog \
+                      vm_name=\"tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}\" \
+                      bundle exec ruby scripts/remove_vm.rb
+                    rm -f fog
+                  """)
+
+                }
+
+                // Fail
+                throw error
+              }
             }
-          }
-        } catch (error) {
-          stage("Failure Cleanup") {
-            step([$class: 'WsCleanup'])
-            description = description + "Build ${config['builds'][index]} failed.  No artifacts for ${config['builds'][index]} uploaded."
-
-            //Cleanup any deployed artifacts
-            if (config['builds'][index] == 'virtualbox') {
-
-              sh(returnStatus: true, script:'vagrant box remove packer_virtualbox')
-
-            } else if (config['builds'][index] == 'vmware') {
-
-              sh(returnStatus: true, script:"""
-                rbenv global 2.3.1
-                eval "\$(rbenv init -)"
-                gem install bundler --version 1.10.6
-                bundle install
-                datacenter=\"${VMWARE_DATACENTER}\" fog_config=fog \
-                  vm_name=\"tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}\" \
-                  bundle exec ruby scripts/remove_vm.rb
-                rm -f fog
-              """)
-
-            }
-
-            // Fail
-            throw error
           }
         }
       }
