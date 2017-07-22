@@ -197,14 +197,12 @@ stage("Build and Test"){
 
                 if (config['publish_images'] != false) {
                   sh("""
-                   export OS_AUTH_URL="${openstack_authurl}"
-                   export OS_TENANT_NAME="${openstack_tenant}"
-                   export OS_PROJECT_NAME="${openstack_tenant}"
-                   export OS_TENANT_ID="${openstack_tenant_id}"
-                   export OS_USERNAME="${vmware_user}"
-                   export OS_PASSWORD="${vmware_pass}"
-                   export OS_REGION_NAME="${openstack_region}"
                     openstack image create \
+                      --os-auth-url "${openstack_authurl}" \
+                      --os-project-name "${openstack_tenant}" \
+                      --os-username "${vmware_user}" \
+                      --os-password "${vmware_pass}" \
+                      --os-region-name "${openstack_region}" \
                       --disk-format vmdk \
                       --file *.vmdk \
                       "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
