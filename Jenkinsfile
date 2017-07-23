@@ -135,6 +135,7 @@ stage("Build and Test"){
                     sh(script:'''
                       rbenv global 2.3.1
                       eval "$(rbenv init -)"
+                      echo $PATH
                       gem install bundler --version 1.10.6
                       bundle install
                       vagrant box add packer_virtualbox file:"//tse-master-virtualbox-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.box"
