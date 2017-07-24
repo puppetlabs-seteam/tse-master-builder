@@ -200,10 +200,11 @@ stage("Build and Test"){
                   sh("""
                     openstack image create \
                       --os-auth-url "${openstack_authurl}" \
-                      --os-project-name "${openstack_tenant}" \
                       --os-username "${vmware_user}" \
                       --os-password "${vmware_pass}" \
                       --os-region-name "${openstack_region}" \
+                      --os-project-name "${openstack_tenant}" \
+                      --os-project-id "${openstack_tenant_id}" \
                       --disk-format vmdk \
                       --file *.vmdk \
                       "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
