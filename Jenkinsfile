@@ -82,14 +82,6 @@ stage("Build and Test"){
                   userRemoteConfigs: [[url: 'https://github.com/ipcrm/ovfparser.git']]
                 ])
 
-                sh("""
-                  set +x
-                  source $OPENSTACK_SCRIPT
-                  set -x
-                  openstack image list
-                  exit 1
-                """)
-
                  ansiColor('xterm') {
                    // Virtualbox Build
                    if (config['builds'][index] == 'virtualbox') {
@@ -204,7 +196,10 @@ stage("Build and Test"){
 
                 if (config['publish_images'] != false) {
                   sh("""
+                    set +x
                     source $OPENSTACK_SCRIPT
+                    set -x
+
                     openstack image create \
                       --disk-format vmdk \
                       --file *.vmdk \
