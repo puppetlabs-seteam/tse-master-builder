@@ -83,7 +83,9 @@ stage("Build and Test"){
                 ])
 
                 sh("""
+                  set +x
                   source $OPENSTACK_SCRIPT
+                  set -x
                   openstack image list
                   exit 1
                 """)
