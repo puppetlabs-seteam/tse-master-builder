@@ -41,13 +41,10 @@ stage("Build and Test"){
             file(credentialsId: 'puppetlabs-seteam-jenkins-fog_config', variable: 'fog_config'),
             file(credentialsId: 'puppetlabs-seteam-jenkins-public_key', variable: 'public_key'),
             file(credentialsId: 'puppetlabs-seteam-jenkins-private_key', variable: 'private_key'),
+            file(credentialsId: 'puppetlabs-seteam-openstack-script', variable: 'openstack_script'),
             usernamePassword(credentialsId: 'vsphere_userpass', passwordVariable: 'vmware_pass', usernameVariable: 'vmware_user'),
             string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
             string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
-            string(credentialsId: 'puppetlabs-seteam-openstack-auth-url', variable: 'openstack_authurl'),
-            string(credentialsId: 'puppetlabs-seteam-openstack-tenant', variable: 'openstack_tenant'),
-            string(credentialsId: 'puppetlabs-seteam-openstack-region', variable: 'openstack_region'),
-            string(credentialsId: 'puppetlabs-seteam-openstack-tenant_id', variable: 'openstack_tenant_id')
           ]
         ){
           pubkey  = readFile public_key
@@ -67,6 +64,7 @@ stage("Build and Test"){
             "VMWARE_USER=${vmware_user}",
             "VMWARE_PASS=${vmware_pass}",
             "FOG_CONFIG=${fog_config}",
+            "OPENSTACK_SCRIPT=${openstack_script}",
             "VMWARE_DS=${config['vmware_datastore']}",
             "VMWARE_NET=${config['vmware_network']}",
             "VMWARE_VI_CONNECTION=${vmware_vi_connection}",
@@ -83,6 +81,12 @@ stage("Build and Test"){
                   submoduleCfg: [],
                   userRemoteConfigs: [[url: 'https://github.com/ipcrm/ovfparser.git']]
                 ])
+
+                sh("""
+                  source $OPENSTACK_SCRIPT
+                  openstack image list
+                  exit 1
+                """)
 
                  ansiColor('xterm') {
                    // Virtualbox Build
@@ -198,13 +202,8 @@ stage("Build and Test"){
 
                 if (config['publish_images'] != false) {
                   sh("""
+                    source $OPENSTACK_SCRIPT
                     openstack image create \
-                      --os-auth-url "${openstack_authurl}" \
-                      --os-username "${vmware_user}" \
-                      --os-password "${vmware_pass}" \
-                      --os-region-name "${openstack_region}" \
-                      --os-project-name "${openstack_tenant}" \
-                      --os-project-id "${openstack_tenant_id}" \
                       --disk-format vmdk \
                       --file *.vmdk \
                       "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
