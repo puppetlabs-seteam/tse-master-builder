@@ -170,9 +170,17 @@ FILE
 
   echo "{\"clone_addr\": \"${GIT_REMOTE}\", \"uid\": 1, \"repo_name\": \"control-repo\"}" > repo.data
   curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
+  if [ $? -ne 0 ]; then
+    echo "Gogs: Failed to create control-repo"
+    exit 5
+  fi
 
   echo "{\"title\":\"puppet master key\",\"key\":\""${PUB_KEY}"\"}" > input.data
   curl -H 'Content-Type: application/json' -X POST -d @input.data http://puppet:puppetlabs@localhost:3000/api/v1/admin/users/puppet/keys
+  if [ $? -ne 0 ]; then
+    echo "Gogs: Failed to create public key"
+    exit 6
+  fi
 
   rm /tmp/git.pp
   rm /tmp/repo.data
