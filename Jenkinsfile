@@ -202,7 +202,7 @@ stage("Build and Test"){
 
                     openstack image create \
                       --disk-format vmdk \
-                      --file *.vmdk \
+                      --file output-virtualbox-ovf/*.vmdk \
                       "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
                   """)
 
