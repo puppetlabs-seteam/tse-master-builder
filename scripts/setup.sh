@@ -301,6 +301,7 @@ sleep 15
 setup_hiera_pe
 run_puppet
 run_puppet
+run_puppet
 add_gogs_webhook
 regen_ssh_keys
 cleanup
