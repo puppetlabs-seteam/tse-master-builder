@@ -195,16 +195,19 @@ stage("Build and Test"){
                 }
 
                 if (config['publish_images'] != false) {
-                  sh("""
-                    set +x
-                    source $OPENSTACK_SCRIPT
-                    set -x
 
-                    openstack image create \
-                      --disk-format vmdk \
-                      --file output-virtualbox-ovf/*.vmdk \
-                      "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
-                  """)
+                  if (config['builds'][index] == 'virtualbox') {
+                    sh("""
+                      set +x
+                      source $OPENSTACK_SCRIPT
+                      set -x
+
+                      openstack image create \
+                        --disk-format vmdk \
+                        --file output-virtualbox-ovf/*.vmdk \
+                        "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}"
+                    """)
+                  }
 
                   step([$class: 'S3BucketPublisher',
                     consoleLogLevel: 'INFO',
