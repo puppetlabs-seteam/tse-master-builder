@@ -48,8 +48,7 @@
       ],
       "environment_vars": [
         "GIT_REMOTE={{ user `GIT_REMOTE`}}",
-        "PRIV_KEY={{ user `PRIV_KEY`}}",
-        "PUB_KEY={{ user `PUB_KEY`}}",
+        "LIC_KEY={{ user `LIC_KEY`}}",
         "DOWNLOAD_VERSION={{ user `DOWNLOAD_VERSION` }}",
         "DOWNLOAD_DIST={{ user `DOWNLOAD_DIST` }}",
         "DOWNLOAD_RELEASE={{ user `DOWNLOAD_RELEASE` }}",
