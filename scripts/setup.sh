@@ -21,8 +21,7 @@ function setup_users {
 
 #Generate SSH Keys
 function generate_keys {
-  echo "${PRIV_KEY}" > /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa
-  echo "${PUB_KEY}" > /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa.pub
+  ssh-keygen -t rsa -b 4096 -N "" -f /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa
 }
 
 #Download PE
@@ -58,6 +57,7 @@ function install_agent {
 
 #Setup PE
 function install_pe {
+  echo "${LIC_KEY}" > /etc/puppetlabs/license.key
   cat > /etc/puppetlabs/puppet/csr_attributes.yaml << YAML
   extension_requests:
       pp_role:  master_server
@@ -175,6 +175,7 @@ FILE
     exit 5
   fi
 
+  PUB_KEY=$(cat /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa.pub)
   echo "{\"title\":\"puppet master key\",\"key\":\""${PUB_KEY}"\"}" > input.data
   curl -H 'Content-Type: application/json' -X POST -d @input.data http://puppet:puppetlabs@localhost:3000/api/v1/admin/users/puppet/keys
   if [ $? -ne 0 ]; then
@@ -223,17 +224,6 @@ function clean_certs {
   /opt/puppetlabs/bin/puppet apply -e "include profile::puppet::clean_certs"
 }
 
-function regen_ssh_keys {
-  rm -f /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa*
-  ssh-keygen -t rsa -b 4096 -N "" -f /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa
-  chown -R pe-puppet:pe-puppet /etc/puppetlabs/puppetserver/ssh
-
-  NEW_PUB_KEY=$(cat /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa.pub)
-  echo "{\"title\":\"new puppet master key\",\"key\":\""${NEW_PUB_KEY}"\"}" > input.data
-  curl -H 'Content-Type: application/json' -X POST -d @input.data http://puppet:puppetlabs@localhost:3000/api/v1/admin/users/puppet/keys
-  rm -f input.data
-}
-
 function vagrant_setup {
   id vagrant &>/dev/null || useradd -m vagrant
   mkdir /home/vagrant/.ssh
@@ -274,6 +264,7 @@ function add_gogs_webhook {
 function cleanup {
   rm -rf /tmp/puppet-enterprise*
   rm -f  /root/puppet-enterprise-*.tar.gz
+  rm -f /etc/puppetlabs/license.key
 
   if [ "$PACKER_BUILDER_TYPE" != "virtualbox-ovf" ]; then
     rm -f /etc/sudoers.d/10_vagrant
@@ -303,7 +294,6 @@ run_puppet
 run_puppet
 run_puppet
 add_gogs_webhook
-regen_ssh_keys
 cleanup
 
 exit 0

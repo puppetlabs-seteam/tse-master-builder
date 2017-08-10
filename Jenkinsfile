@@ -39,22 +39,18 @@ stage("Build and Test"){
         withCredentials(
           [
             file(credentialsId: 'puppetlabs-seteam-jenkins-fog_config', variable: 'fog_config'),
-            file(credentialsId: 'puppetlabs-seteam-jenkins-public_key', variable: 'public_key'),
-            file(credentialsId: 'puppetlabs-seteam-jenkins-private_key', variable: 'private_key'),
+            file(credentialsId: 'puppetlabs-seteam-license_key', variable: 'license_key'),
             file(credentialsId: 'puppetlabs-seteam-openstack-script', variable: 'openstack_script'),
             usernamePassword(credentialsId: 'vsphere_userpass', passwordVariable: 'vmware_pass', usernameVariable: 'vmware_user'),
             string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
             string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
           ]
         ){
-          pubkey  = readFile public_key
-          privkey = readFile private_key
+          license = readFile license_key
 
           withEnv([
             'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
             "GIT_REMOTE=${config['git_remote']}",
-            "PRIV_KEY=${privkey}",
-            "PUB_KEY=${pubkey}",
             "DOWNLOAD_VERSION=${config['download_version']}",
             "DOWNLOAD_DIST=${config['pe_dist']}",
             "DOWNLOAD_RELEASE=${config['pe_release']}",
@@ -64,6 +60,7 @@ stage("Build and Test"){
             "VMWARE_USER=${vmware_user}",
             "VMWARE_PASS=${vmware_pass}",
             "FOG_CONFIG=${fog_config}",
+            "LIC_KEY=${license}",
             "OPENSTACK_SCRIPT=${openstack_script}",
             "VMWARE_DS=${config['vmware_datastore']}",
             "VMWARE_NET=${config['vmware_network']}",
@@ -83,6 +80,7 @@ stage("Build and Test"){
                 ])
 
                  ansiColor('xterm') {
+
                    // Virtualbox Build
                    if (config['builds'][index] == 'virtualbox') {
                      sh(script:'./build.sh virtualbox-ovf')
@@ -186,13 +184,19 @@ stage("Build and Test"){
               }
 
               stage ("Upload"){
-                sh 'mkdir commits releases'
+                sh 'mkdir commits releases branches'
 
-                if (buildType == 'commit') {
-                  sh 'find . -name "*.box" -o -name "*.ova" | xargs -I {} mv {} commits/'
+                // Set Target
+                if (env.BRANCH_NAME != 'master') {
+                  target = 'branches'
+                } else if (buildType == 'commit') {
+                  target = 'commits'
                 } else if (buildType == 'release') {
-                  sh 'find . -name "*.box" -o -name "*.ova" | xargs -I {} mv {} releases/'
+                  target = 'releases'
                 }
+
+                // Move Archive
+                sh "find . -name \"*.box\" -o -name \"*.ova\" | xargs -I {} mv {} ${target}/"
 
                 if (config['publish_images'] != false) {
 

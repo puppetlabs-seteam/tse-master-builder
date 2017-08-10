@@ -3,12 +3,6 @@ set -x
 
 if [ -z $1 ]; then
   echo "MUST PASS BUILDER, virtualbox-ovf or vmware-vmx! Exiting..."
-  exit 2
-fi
-
-
-if [ "${PRIV_KEY}" == ''] || [ "${PUB_KEY}" == '' ]; then
-  echo "MUST SET PRIV_KEY and PUB_KEY, exiting..."
   exit 1
 fi
 
@@ -21,8 +15,7 @@ else
   export GIT_VERSION=$GIT_TAG
 fi
 
-PRIV_KEY="${PRIV_KEY}"
-PUB_KEY="${PUB_KEY}"
+LIC_KEY="${LIC_KEY}"
 DOWNLOAD_VERSION=${DOWNLOAD_VERSION:-2017.2.2}
 DOWNLOAD_DIST=${DOWNLOAD_DIST:-el}
 DOWNLOAD_RELEASE=${DOWNLOAD_RELEASE:-7}
@@ -109,8 +102,7 @@ packer build \
   -parallel=false \
   -var "GIT_VERSION=$GIT_VERSION" \
   -var "GIT_REMOTE=$GIT_REMOTE" \
-  -var "PRIV_KEY=$PRIV_KEY" \
-  -var "PUB_KEY=$PUB_KEY" \
+  -var "LIC_KEY=$LIC_KEY" \
   -var "BUILD_VER=$BUILD_VER" \
   -var "DOWNLOAD_VERSION=$DOWNLOAD_VERSION" \
   -var "DOWNLOAD_DIST=$DOWNLOAD_DIST" \
