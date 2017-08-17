@@ -183,6 +183,22 @@ FILE
     exit 6
   fi
 
+  # Prune non-production branches
+  echo "Pruning branches...."
+  mkdir ~/.ssh
+  chmod 700 ~/.ssh
+  ssh-keyscan localhost > ~/.ssh/known_hosts
+  echo -e "Host localhost\n\tIdentityFile /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa" > ~/.ssh/config
+  git clone git@localhost:puppet/control-repo.git control-repo
+  cd control-repo
+
+  for i in $(git branch -a|grep -v production|awk -F '/' '{print $3}')
+  do
+    git push origin :${i}
+  done
+  cd ../
+
+  rm -rf /tmp/control-repo
   rm /tmp/git.pp
   rm /tmp/repo.data
   rm /tmp/input.data
