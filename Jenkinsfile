@@ -48,8 +48,8 @@ stage("Build and Test"){
         ){
           license = readFile license_key
 
-          #Need to store a version of download_version with dashes
-          $download_version_dash = config['download_version'].replace("\.","-")
+          // Need to store a version of download_version with dashes
+          download_version_dash = config['download_version'].replace('.','-')
 
           withEnv([
             'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
