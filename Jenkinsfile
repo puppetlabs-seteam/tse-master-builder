@@ -48,19 +48,21 @@ stage("Build and Test"){
         ){
           license = readFile license_key
 
-          // Need to store a version of download_version with dashes
-          download_version_dash = config['download_version'].replace('.','-')
+          // Need to store a version of vars without dots
+          download_version_dash = config['download_version'].replace('.','')
+          git_current = gitCurrent.replace('.','-')
 
           withEnv([
             'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
             "GIT_REMOTE=${config['git_remote']}",
             "DOWNLOAD_VERSION=${config['download_version']}",
-            "DWNLD_VER_DASH=${download_version_dash}",
+            "DWNLD_VER=${download_version_dash}",
             "DOWNLOAD_DIST=${config['pe_dist']}",
             "DOWNLOAD_RELEASE=${config['pe_release']}",
             "DOWNLOAD_ARCH=${config['pe_arch']}",
             "DOWNLOAD_RC=${config['ga_release']}",
             "GIT_CURRENT=${gitCurrent}",
+            "GIT_CUR=${git_current}",
             "VMWARE_USER=${vmware_user}",
             "VMWARE_PASS=${vmware_pass}",
             "FOG_CONFIG=${fog_config}",
@@ -213,7 +215,7 @@ stage("Build and Test"){
                       openstack image create \
                         --disk-format vmdk \
                         --file output-virtualbox-ovf/*.vmdk \
-                        "tse-master-${DWNLD_VER_DASH}-v${GIT_CURRENT}"
+                        "tse-master-${DWNLD_VER}-v${GIT_CUR}"
                     """)
                   }
 
