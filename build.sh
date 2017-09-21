@@ -6,13 +6,11 @@ if [ -z $1 ]; then
   exit 1
 fi
 
-# Determine if this is a tagged version, or just a commit
-GIT_TAG=$(git describe --exact-match --tags HEAD 2>/dev/null || echo 'null')
-
-if [ $GIT_TAG == 'null' ]; then
-  export GIT_VERSION=$(git rev-parse --short HEAD)
-else
-  export GIT_VERSION=$GIT_TAG
+# GIT_VERSION should be set from Jenkins
+GIT_VERSION="${GIT_CURRENT}"
+if [ -z $GIT_VERSION ]; then
+  echo "ENV Var GIT_CURRENT Not set, exiting!"
+  exit 10
 fi
 
 LIC_KEY="${LIC_KEY}"
