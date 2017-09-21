@@ -10,7 +10,7 @@ def description = ''
 stage("Setup") {
   node {
 
-    checkout scm
+    git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
 
     // Store build configuration in config var (map)
     // keys: download_version (string), ga_release=(bool), pe_dist=(string), pe_release=(int), pe_arch=(string)
@@ -86,7 +86,7 @@ stage("Build and Test"){
           ]){
             try {
               stage ("Build tse-master-${config['builds'][index]}") {
-                checkout scm
+                git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
                 checkout([
                   $class: 'GitSCM',
                   branches: [[name: '*/master']],
@@ -141,7 +141,7 @@ stage("Build and Test"){
               }
 
               stage ("Test tse-master-${config['builds'][index]}") {
-                checkout scm
+                git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
                 ansiColor('xterm') {
                   // Virtualbox Build
                   if (config['builds'][index] == 'virtualbox') {
