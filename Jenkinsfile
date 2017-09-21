@@ -219,44 +219,49 @@ stage("Build and Test"){
                     """)
                   }
 
-                  step([$class: 'S3BucketPublisher',
-                    consoleLogLevel: 'INFO',
-                    dontWaitForConcurrentBuildCompletion: false,
-                    entries: [
-                      [
-                        bucket: 'tse-builds/tse-demo-env',
-                        excludedFile: '',
-                        flatten: false,
-                        gzipFiles: false,
-                        keepForever: true,
-                        managedArtifacts: false,
-                        noUploadOnFailure: true,
-                        selectedRegion: 'us-west-2',
-                        showDirectlyInBrowser: false,
-                        sourceFile: '*/*.ova',
-                        storageClass: 'STANDARD',
-                        uploadFromSlave: false,
-                        useServerSideEncryption: false
+                  // Only Upload to S3 if this is GA (RCs get uploaded to SLICE)
+                  if ( config['ga_release'] == true ) {
+
+                    step([$class: 'S3BucketPublisher',
+                      consoleLogLevel: 'INFO',
+                      dontWaitForConcurrentBuildCompletion: false,
+                      entries: [
+                        [
+                          bucket: 'tse-builds/tse-demo-env',
+                          excludedFile: '',
+                          flatten: false,
+                          gzipFiles: false,
+                          keepForever: true,
+                          managedArtifacts: false,
+                          noUploadOnFailure: true,
+                          selectedRegion: 'us-west-2',
+                          showDirectlyInBrowser: false,
+                          sourceFile: '*/*.ova',
+                          storageClass: 'STANDARD',
+                          uploadFromSlave: false,
+                          useServerSideEncryption: false
+                        ],
+                        [
+                          bucket: 'tse-builds/tse-demo-env',
+                          excludedFile: '',
+                          flatten: false,
+                          gzipFiles: false,
+                          keepForever: true,
+                          managedArtifacts: false,
+                          noUploadOnFailure: true,
+                          selectedRegion: 'us-west-2',
+                          showDirectlyInBrowser: false,
+                          sourceFile: '*/*.box',
+                          storageClass: 'STANDARD',
+                          uploadFromSlave: false,
+                          useServerSideEncryption: false]
                       ],
-                      [
-                        bucket: 'tse-builds/tse-demo-env',
-                        excludedFile: '',
-                        flatten: false,
-                        gzipFiles: false,
-                        keepForever: true,
-                        managedArtifacts: false,
-                        noUploadOnFailure: true,
-                        selectedRegion: 'us-west-2',
-                        showDirectlyInBrowser: false,
-                        sourceFile: '*/*.box',
-                        storageClass: 'STANDARD',
-                        uploadFromSlave: false,
-                        useServerSideEncryption: false]
-                    ],
-                    pluginFailureResultConstraint: 'FAILURE',
-                    profileName: 'tse-jenkins',
-                    userMetadata: []
-                  ])
+                      pluginFailureResultConstraint: 'FAILURE',
+                      profileName: 'tse-jenkins',
+                      userMetadata: []
+                    ])
+
+                  }
 
                 }
 
