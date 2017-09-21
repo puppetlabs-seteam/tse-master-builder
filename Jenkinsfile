@@ -2,7 +2,7 @@
 import org.yaml.snakeyaml.Yaml
 
 // main
-def config = null
+def config = [:]
 def gitCurrent = null
 def buildType = null
 def description = ''
