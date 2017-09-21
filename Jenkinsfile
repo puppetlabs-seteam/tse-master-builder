@@ -27,11 +27,14 @@ stage("Setup") {
     config['pe_arch']    = env.PE_ARCH
     config['builds']     = env.BUILDS.split(',')
 
-    // Determine if this is a tagged version, or just a commit
-    def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
-    def gitVersion = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-    gitCurrent = gitTag != '' ? gitTag : gitVersion
-    buildType = gitTag != '' ? 'release' : 'commit'
+    // Determine if this is a tagged version, or just a commit (this gets read from the control-repo)
+    dir ('control-repo') {
+      git branch: 'production', changelog: false, poll: false, url: env.GIT_REMOTE
+      def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
+      def gitVersion = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+      gitCurrent = gitTag != '' ? gitTag : gitVersion
+      buildType = gitTag != '' ? 'release' : 'commit'
+    }
 
     print "Requested builds for ${config['builds']} using version ${gitCurrent}"
   }
