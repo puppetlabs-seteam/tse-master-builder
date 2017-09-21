@@ -6,26 +6,23 @@ if [ -z $1 ]; then
   exit 1
 fi
 
-# Determine if this is a tagged version, or just a commit
-GIT_TAG=$(git describe --exact-match --tags HEAD 2>/dev/null || echo 'null')
-
-if [ $GIT_TAG == 'null' ]; then
-  export GIT_VERSION=$(git rev-parse --short HEAD)
-else
-  export GIT_VERSION=$GIT_TAG
+# GIT_VERSION should be set from Jenkins
+GIT_VERSION="${GIT_CURRENT}"
+if [ -z $GIT_VERSION ]; then
+  echo "ENV Var GIT_CURRENT Not set, exiting!"
+  exit 10
 fi
 
 LIC_KEY="${LIC_KEY}"
-DOWNLOAD_VERSION=${DOWNLOAD_VERSION:-2017.2.2}
-DOWNLOAD_DIST=${DOWNLOAD_DIST:-el}
-DOWNLOAD_RELEASE=${DOWNLOAD_RELEASE:-7}
-DOWNLOAD_ARCH=${DOWNLOAD_ARCH:-x86_64}
-DOWNLOAD_RC=${DOWNLOAD_RC:-1}
-GIT_VER=$(git rev-parse --short HEAD)
-BUILD_VER=${VERSION:-$GIT_VER}
+DOWNLOAD_VERSION="${DOWNLOAD_VERSION}"
+DOWNLOAD_DIST="${DOWNLOAD_DIST}"
+DOWNLOAD_RELEASE="${DOWNLOAD_RELEASE}"
+DOWNLOAD_ARCH="${DOWNLOAD_ARCH}"
+DOWNLOAD_RC="${DOWNLOAD_RC}"
+BUILD_VER="${GIT_VERSION}"
 VMX_SOURCE_URL='https://atlas.hashicorp.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.0/providers/vmware_fusion.box'
 OVF_SOURCE_URL='https://atlas.hashicorp.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.1/providers/virtualbox.box'
-GIT_REMOTE=${GIT_REMOTE:-'https://github.com/puppetlabs-seteam/control-repo.git'}
+GIT_REMOTE="${GIT_REMOTE}"
 
 # Setup VMX for import
 if [ ! -f '/var/tmp/vmware_fusion/import.vmx' ]; then

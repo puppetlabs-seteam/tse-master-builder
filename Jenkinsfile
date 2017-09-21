@@ -2,7 +2,7 @@
 import org.yaml.snakeyaml.Yaml
 
 // main
-def config = null
+def config = [:]
 def gitCurrent = null
 def buildType = null
 def description = ''
@@ -10,20 +10,31 @@ def description = ''
 stage("Setup") {
   node {
 
-    checkout scm
+    git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
 
     // Store build configuration in config var (map)
     // keys: download_version (string), ga_release=(bool), pe_dist=(string), pe_release=(int), pe_arch=(string)
     //       git_remote=(string, optional), public_key=(string, optional), priv_key=(string, optional)
     //       publish_images=(bool)
-    config = loadConfig(readFile('config/default.yaml')) + loadConfig(readFile('config/build.yaml'))
-    config['ga_release'] = config['ga_release'] == true ? 1 : 0
+    config['download_version'] = env.DOWNLOAD_VERSION
+    config['publish_images'] = env.PUBLISH_IMAGES.toBoolean() == true ? 1 : 0
+    config['ga_release'] = env.GA_RELEASE.toBoolean() == true ? 1 : 0
+    config['pe_release'] = env.DIST_RELEASE.toInteger()
+    config['git_remote'] = env.GIT_REMOTE
+    config['public_key'] = env.PUBLIC_KEY
+    config['priv_key']   = env.PRIV_KEY
+    config['pe_dist']    = env.PE_DIST
+    config['pe_arch']    = env.PE_ARCH
+    config['builds']     = env.BUILDS.split(',')
 
-    // Determine if this is a tagged version, or just a commit
-    def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
-    def gitVersion = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-    gitCurrent = gitTag != '' ? gitTag : gitVersion
-    buildType = gitTag != '' ? 'release' : 'commit'
+    // Determine if this is a tagged version, or just a commit (this gets read from the control-repo)
+    dir ('control-repo') {
+      git branch: 'production', changelog: false, poll: false, url: env.GIT_REMOTE
+      def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
+      def gitVersion = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+      gitCurrent = gitTag != '' ? gitTag : gitVersion
+      buildType = gitTag != '' ? 'release' : 'commit'
+    }
 
     print "Requested builds for ${config['builds']} using version ${gitCurrent}"
   }
@@ -75,7 +86,7 @@ stage("Build and Test"){
           ]){
             try {
               stage ("Build tse-master-${config['builds'][index]}") {
-                checkout scm
+                git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
                 checkout([
                   $class: 'GitSCM',
                   branches: [[name: '*/master']],
@@ -130,7 +141,7 @@ stage("Build and Test"){
               }
 
               stage ("Test tse-master-${config['builds'][index]}") {
-                checkout scm
+                git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
                 ansiColor('xterm') {
                   // Virtualbox Build
                   if (config['builds'][index] == 'virtualbox') {
