@@ -25,6 +25,7 @@ stage("Setup") {
     config['priv_key']   = env.PRIV_KEY
     config['pe_dist']    = env.PE_DIST
     config['pe_arch']    = env.PE_ARCH
+    config['builds']     = env.BUILDS.split(',')
 
     // Determine if this is a tagged version, or just a commit
     def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
