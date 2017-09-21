@@ -16,8 +16,15 @@ stage("Setup") {
     // keys: download_version (string), ga_release=(bool), pe_dist=(string), pe_release=(int), pe_arch=(string)
     //       git_remote=(string, optional), public_key=(string, optional), priv_key=(string, optional)
     //       publish_images=(bool)
-    config = loadConfig(readFile('config/default.yaml')) + loadConfig(readFile('config/build.yaml'))
-    config['ga_release'] = config['ga_release'] == true ? 1 : 0
+    config['download_version'] = $PE_RELEASE
+    config['publish_images'] = $PUBLISH_IMAGES.toBoolean() == true ? 1 : 0
+    config['ga_release'] = $GA_RELEASE.toBoolean() == true ? 1 : 0
+    config['pe_release'] = $PE_RELEASE.toInteger()
+    config['git_remote'] = $GIT_REMOTE
+    config['public_key'] = $PUBLIC_KEY
+    config['priv_key']   = $PRIV_KEY
+    config['pe_dist']    = $PE_DIST
+    config['pe_arch']    = $PE_ARCH
 
     // Determine if this is a tagged version, or just a commit
     def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
