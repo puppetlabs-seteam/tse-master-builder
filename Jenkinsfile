@@ -16,10 +16,10 @@ stage("Setup") {
     // keys: download_version (string), ga_release=(bool), pe_dist=(string), pe_release=(int), pe_arch=(string)
     //       git_remote=(string, optional), public_key=(string, optional), priv_key=(string, optional)
     //       publish_images=(bool)
-    config['download_version'] = env.PE_RELEASE
+    config['download_version'] = env.DOWNLOAD_VERSION
     config['publish_images'] = env.PUBLISH_IMAGES.toBoolean() == true ? 1 : 0
     config['ga_release'] = env.GA_RELEASE.toBoolean() == true ? 1 : 0
-    config['pe_release'] = env.PE_RELEASE.toInteger()
+    config['pe_release'] = env.DIST_RELEASE.toInteger()
     config['git_remote'] = env.GIT_REMOTE
     config['public_key'] = env.PUBLIC_KEY
     config['priv_key']   = env.PRIV_KEY
