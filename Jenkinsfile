@@ -207,7 +207,7 @@ stage("Build and Test"){
                 sh 'mkdir commits releases branches'
 
                 // Set Target
-                if (env.BRANCH_NAME != 'master') {
+                if (env.BUILD_BRANCH != 'master') {
                   target = 'branches'
                 } else if (buildType == 'commit') {
                   target = 'commits'
