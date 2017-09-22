@@ -17,6 +17,8 @@ stage("Setup") {
     //       git_remote=(string, optional), public_key=(string, optional), priv_key=(string, optional)
     //       publish_images=(bool)
     config['download_version'] = env.DOWNLOAD_VERSION
+    config['vmware_datastore'] = env.VMWARE_DATASTORE
+    config['vmware_network'] = env.VMWARE_NETWORK
     config['publish_images'] = env.PUBLISH_IMAGES.toBoolean() == true ? 1 : 0
     config['ga_release'] = env.GA_RELEASE.toBoolean() == true ? 1 : 0
     config['pe_release'] = env.DIST_RELEASE.toInteger()
@@ -26,6 +28,7 @@ stage("Setup") {
     config['pe_dist']    = env.PE_DIST
     config['pe_arch']    = env.PE_ARCH
     config['builds']     = env.BUILDS.split(',')
+
 
     // Determine if this is a tagged version, or just a commit (this gets read from the control-repo)
     dir ('control-repo') {
