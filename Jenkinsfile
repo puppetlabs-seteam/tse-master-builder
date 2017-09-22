@@ -234,7 +234,7 @@ stage("Build and Test"){
                   }
 
                   // Only Upload to S3 if this is GA (RCs get uploaded to SLICE)
-                  if ( config['ga_release'] == true ) {
+                  if ( config['ga_release'] == 1 ) {
 
                     step([$class: 'S3BucketPublisher',
                       consoleLogLevel: 'INFO',
