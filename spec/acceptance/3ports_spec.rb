@@ -3,7 +3,7 @@ require 'spec_helper_acceptance'
 describe 'Validate Ports' do
   context 'Verify Listening ' do
     [
-      80,
+      81,
       8140,
       8142,
       8143,
