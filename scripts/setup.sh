@@ -183,14 +183,19 @@ FILE
     exit 6
   fi
 
-  # Prune non-production branches
-  echo "Pruning branches...."
+  # Reset hard back to our build version
+  echo "Resetting to build version..."
   mkdir ~/.ssh
   chmod 700 ~/.ssh
   ssh-keyscan localhost > ~/.ssh/known_hosts
   echo -e "Host localhost\n\tIdentityFile /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa" > ~/.ssh/config
   git clone git@localhost:puppet/control-repo.git control-repo
   cd control-repo
+  git reset --hard $BUILD_VER
+  git push origin production -f
+
+  # Prune non-production branches
+  echo "Pruning branches...."
 
   for i in $(git branch -a|grep -v production|awk -F '/' '{print $3}')
   do
