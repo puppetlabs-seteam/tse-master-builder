@@ -218,7 +218,7 @@ stage("Build and Test"){
                 // Move Archive
                 sh "find . -name \"*.box\" -o -name \"*.ova\" | xargs -I {} mv {} ${target}/"
 
-                if (config['publish_images'] != false) {
+                if (config['publish_images'] == 1) {
 
                   if (config['builds'][index] == 'virtualbox') {
                     sh("""
