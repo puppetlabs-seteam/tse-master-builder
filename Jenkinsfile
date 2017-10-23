@@ -20,6 +20,7 @@ stage("Setup") {
     config['vmware_datastore'] = env.VMWARE_DATASTORE
     config['vmware_network'] = env.VMWARE_NETWORK
     config['publish_images'] = env.PUBLISH_IMAGES.toBoolean() == true ? 1 : 0
+    config['build_version'] = env.BUILD_VERSION
     config['ga_release'] = env.GA_RELEASE.toBoolean() == true ? 1 : 0
     config['pe_release'] = env.DIST_RELEASE.toInteger()
     config['git_remote'] = env.GIT_REMOTE
@@ -29,10 +30,10 @@ stage("Setup") {
     config['pe_arch']    = env.PE_ARCH
     config['builds']     = env.BUILDS.split(',')
 
-
     // Determine if this is a tagged version, or just a commit (this gets read from the control-repo)
     dir ('control-repo') {
       git branch: 'production', changelog: false, poll: false, url: env.GIT_REMOTE
+      sh("git reset --hard ${config['build_version']}")
       def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
       def gitVersion = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
       gitCurrent = gitTag != '' ? gitTag : gitVersion

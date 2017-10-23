@@ -47,6 +47,7 @@
         "scripts/setup.sh"
       ],
       "environment_vars": [
+        "BUILD_VER={{ user `BUILD_VER`}}",
         "GIT_REMOTE={{ user `GIT_REMOTE`}}",
         "LIC_KEY={{ user `LIC_KEY`}}",
         "DOWNLOAD_VERSION={{ user `DOWNLOAD_VERSION` }}",
