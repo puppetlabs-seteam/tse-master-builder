@@ -21,6 +21,7 @@ stage("Setup") {
     config['vmware_network'] = env.VMWARE_NETWORK
     config['publish_images'] = env.PUBLISH_IMAGES.toBoolean() == true ? 1 : 0
     config['build_version'] = env.BUILD_VERSION
+    config['build_notice'] = env.BUILD_NOTICE
     config['ga_release'] = env.GA_RELEASE.toBoolean() == true ? 1 : 0
     config['pe_release'] = env.DIST_RELEASE.toInteger()
     config['git_remote'] = env.GIT_REMOTE
@@ -30,6 +31,10 @@ stage("Setup") {
     config['pe_arch']    = env.PE_ARCH
     config['builds']     = env.BUILDS.split(',')
 
+    if (!config['build_version']?.trim()) {
+      error("FAILED - BUILD_VERSION parameter cannot be left empty!")
+    }
+
     // Determine if this is a tagged version, or just a commit (this gets read from the control-repo)
     dir ('control-repo') {
       git branch: 'production', changelog: false, poll: false, url: env.GIT_REMOTE
@@ -38,6 +43,8 @@ stage("Setup") {
       def gitVersion = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
       gitCurrent = gitTag != '' ? gitTag : gitVersion
       buildType = gitTag != '' ? 'release' : 'commit'
+      changelog = sh(returnStdout: true, script: "git log --no-color --pretty=format:\"%h %ad | %s%d [%an]%n   %b%n\" --graph --notes --date=short \$(git describe --abbrev=0 --tags ${config['build_version']}^)..${config['build_version']}")
+
     }
 
     print "Requested builds for ${config['builds']} using version ${gitCurrent}"
@@ -327,6 +334,11 @@ stage("Build and Test"){
 description = description == '' ? 'Build Successful.' : description
 description = description + "\nArtifact location <a href=\"http://tse-builds.s3-website-us-west-2.amazonaws.com/tse-demo-env/${buildType}s\">here</a>."
 currentBuild.description = description
+
+//Notify - Only on master, ie stable, tse-master-builder builds
+if (env.BUILD_BRANCH == 'master') {
+  emailext body: "New Release has been published!  Version: ${config['build_version']}\nArtifact location: http://tse-builds.s3-website-us-west-2.amazonaws.com/tse-demo-env/${buildType}s\nDocs: https://confluence.puppetlabs.com/display/TSE/Demo+Env+Reboot\n\nChanges:\n${changelog}", subject: "[SE Demo Environment] - New Release! (${config['build_version']})", to: "${config['build_notice']}", replyTo: 'noreply@noreply.com'
+}
 
 // functions
 def loadConfig(def yaml){
