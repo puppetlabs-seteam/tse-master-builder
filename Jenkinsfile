@@ -336,7 +336,7 @@ description = description + "\nArtifact location <a href=\"http://tse-builds.s3-
 currentBuild.description = description
 
 //Notify - Only on master, ie stable, tse-master-builder builds
-if (env.BUILD_BRANCH == 'master') {
+if (env.BUILD_BRANCH == 'master' &&  buildType == 'release') {
   emailext body: "New Release has been published!  Version: PE ${config['download_version']} @ ${config['build_version']}\nArtifact location: http://tse-builds.s3-website-us-west-2.amazonaws.com/tse-demo-env/${buildType}s\nDocs: https://confluence.puppetlabs.com/display/TSE/Demo+Env+Reboot\n\nChanges:\n${changelog}", subject: "[SE Demo Environment] - New Release! (PE ${config['download_version']} @ ${config['build_version']})", to: "${config['build_notice']}", replyTo: 'noreply@puppet.com'
 }
 
