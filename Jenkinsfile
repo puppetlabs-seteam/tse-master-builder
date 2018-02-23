@@ -177,6 +177,7 @@ stage("Build and Test"){
                      sh(script:"""
                        # VMWARE: Acceptance Testing, Start by uploading OVF
                        /Applications/VMware\\ OVF\\ Tool/ovftool \
+                         -vf="cs-general/tse/home" \
                          --noSSLVerify       \
                          --skipManifestCheck \
                          --acceptAllEulas    \
@@ -200,9 +201,7 @@ stage("Build and Test"){
                       eval "\$(rbenv init -)"
                       gem install bundler --version 1.10.6
                       bundle install
-                      datacenter=\"${VMWARE_DATACENTER}\" fog_config=fog \
-                        vm_name=\"tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}\" \
-                        bundle exec ruby scripts/remove_vm.rb
+                      datacenter="${VMWARE_DATACENTER}" fog_config=fog vm_name="cs-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" bundle exec ruby scripts/remove_vm.rb
                       rm -f fog
                     """)
 
@@ -283,6 +282,14 @@ stage("Build and Test"){
                       userMetadata: []
                     ])
 
+                    // Launch job to convert ova to AMI(s)
+                    build job: 'se-master-builder-ami-upload', wait: false, parameters: [
+                      string(name: 'SOURCE_OVA', value: "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.ova" ),
+                      string(name: 'S3_BUCKET', value: 'tse-builds'),
+                      string(name: 'S3_KEY', value: "tse-demo-env/${target}/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.ova" ),
+                      string(name: 'BUILD_NOTICE', value: config['build_notice']),
+                      string(name: 'BUILD_BRANCH', value: env.BUILD_BRANCH )
+                    ]
                   }
 
                 }
@@ -295,7 +302,6 @@ stage("Build and Test"){
 
             } catch (error) {
               stage("Failure Cleanup") {
-                step([$class: 'WsCleanup'])
                 description = description + "Build ${config['builds'][index]} failed.  No artifacts for ${config['builds'][index]} uploaded."
 
                 //Cleanup any deployed artifacts
@@ -305,18 +311,23 @@ stage("Build and Test"){
 
                 } else if (config['builds'][index] == 'vmware') {
 
+                  // VMWARE: Put Fog config in place
+                  sh(returnStatus: true, script:"""
+                    cat $FOG_CONFIG > fog
+                  """)
+
                   sh(returnStatus: true, script:"""
                     rbenv global 2.3.1
                     eval "\$(rbenv init -)"
                     gem install bundler --version 1.10.6
                     bundle install
-                    datacenter=\"${VMWARE_DATACENTER}\" fog_config=fog \
-                      vm_name=\"tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}\" \
-                      bundle exec ruby scripts/remove_vm.rb
+                    datacenter="${VMWARE_DATACENTER}" fog_config=fog vm_name="cs-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" bundle exec ruby scripts/remove_vm.rb
                     rm -f fog
                   """)
 
                 }
+
+                step([$class: 'WsCleanup'])
 
                 // Fail
                 throw error
@@ -337,7 +348,21 @@ currentBuild.description = description
 
 //Notify - Only on master, ie stable, tse-master-builder builds
 if (env.BUILD_BRANCH == 'master' &&  buildType == 'release') {
-  emailext body: "New Release has been published!  Version: PE ${config['download_version']} @ ${config['build_version']}\nArtifact location: http://tse-builds.s3-website-us-west-2.amazonaws.com/tse-demo-env/${buildType}s\nDocs: https://confluence.puppetlabs.com/display/TSE/Demo+Env+Reboot\n\nChanges:\n${changelog}", subject: "[SE Demo Environment] - New Release! (PE ${config['download_version']} @ ${config['build_version']})", to: "${config['build_notice']}", replyTo: 'noreply@puppet.com'
+  emailext(
+    to: "${config['build_notice']}",
+    subject: "[SE Demo Environment] - New Release! (PE ${config['download_version']} @ ${config['build_version']})",
+    replyTo: 'noreply@puppet.com'
+    body: """
+      New Release has been published!  Version: PE ${config['download_version']} @ ${config['build_version']}
+
+      Artifact location: http://tse-builds.s3-website-us-west-2.amazonaws.com/tse-demo-env/${buildType}s 
+      Docs: https://confluence.puppetlabs.com/display/TSE/Demo+Env+Reboot
+
+      Note, an AMI Creation Job has been started (a second email notice will be sent once it completes).
+
+      Changes:\n${changelog}
+    """
+  )
 }
 
 // functions
