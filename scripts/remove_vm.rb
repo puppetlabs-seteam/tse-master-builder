@@ -22,8 +22,7 @@ begin
   end
 
   puts "Deleting #{vm.name}"
-  puts "Mock for now, #{vm.name} not really removed..."
-  #vm.Destroy_Task
+  vm.Destroy_Task
   puts "#{vm.name} Removed"
 rescue
   abort("ERROR: #{$!}")

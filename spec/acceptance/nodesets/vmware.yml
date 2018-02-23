@@ -12,6 +12,6 @@ CONFIG:
     auth_methods: ["password"]
   type: aio
   datastore: tintri-opdx-1-support1
-  folder: tse/home
-  datacenter: cs-general
+  folder: cs-general/tse/home
+  datacenter: opdx1
   dot_fog: 'fog'
