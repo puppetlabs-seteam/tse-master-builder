@@ -11,7 +11,7 @@ CONFIG:
     password: puppetlabs
     auth_methods: ["password"]
   type: aio
-  datastore: persistent1
-  folder: TSEs/testing
-  datacenter: west1
+  datastore: tintri-opdx-1-support1
+  folder: tse/home
+  datacenter: cs-general
   dot_fog: 'fog'
