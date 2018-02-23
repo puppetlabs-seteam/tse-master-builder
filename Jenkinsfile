@@ -177,6 +177,7 @@ stage("Build and Test"){
                      sh(script:"""
                        # VMWARE: Acceptance Testing, Start by uploading OVF
                        /Applications/VMware\\ OVF\\ Tool/ovftool \
+                         -vf="cs-general/tse/home" \
                          --noSSLVerify       \
                          --skipManifestCheck \
                          --acceptAllEulas    \
