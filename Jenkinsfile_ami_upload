@@ -28,7 +28,6 @@ node ('tse-master-builder-vmware') {
       error("FAILED - BUILD_NOTICE parameter cannot be left empty!")
     }
 
-    sh(script:'pip install awscli --upgrade --user')
   }
 
   stage("Upload/Convert") {
@@ -47,6 +46,9 @@ node ('tse-master-builder-vmware') {
           "AWS_DEFAULT_REGION=us-west-2",
           "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin"
         ]) {
+
+          sh(script:'pip install awscli --upgrade --user')
+
           def bucket = [:]
           bucket["S3Bucket"] = config['s3_bucket']
           bucket["S3Key"] = config['s3_key']
