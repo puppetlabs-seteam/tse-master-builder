@@ -51,11 +51,12 @@ node ('tse-master-builder-vmware') {
         returnStdout: true,
         script: "aws ec2 import-image --license-type BYOL  --disk-containers file://containers.json --region us-west-2"
       )
-      def ami_job = new XmlSlurper().parseText(xml).importTaskId
+      println(xml)
+      def ami_job = new XmlSlurper().parseText(xml.trim()).importTaskId
 
       //Get the new AMI id
       def xml1 = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
-      def imageId = new XmlSlurper().parseText(xml1).imageId
+      def imageId = new XmlSlurper().parseText(xml1.trim()).imageId
 
       //Wait for it to complete
       timeout(time: 2, unit: 'HOURS'){
