@@ -71,7 +71,7 @@ node ('tse-master-builder-vmware') {
 
           if (status == 'completed'){
             imageId = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['ImageId']
-            sh("aws ec2 create-tags --resources ${imageId} --tags Key=Name,Value=${config['source_ova']}")
+            sh("aws ec2 create-tags --resources ${imageId} --tags Key=Name,Value=${config['source_ova']} --region us-west-2")
             return true
           } else {
             sleep 300
