@@ -44,7 +44,8 @@ node ('tse-master-builder-vmware') {
         withEnv([
           "AWS_ACCESS_KEY_ID=${aws_acckey}",
           "AWS_SECRET_ACCESS_KEY=${aws_skey}",
-          "AWS_DEFAULT_REGION=us-west-2"
+          "AWS_DEFAULT_REGION=us-west-2",
+          "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin"
         ]) {
           def bucket = [:]
           bucket["S3Bucket"] = config['s3_bucket']
