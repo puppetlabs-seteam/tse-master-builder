@@ -51,9 +51,9 @@ node ('tse-master-builder-vmware') {
         jsonconfig['Description'] = "SE Demo Puppetmaster OVA"
         jsonconfig['Format'] = "ova"
         jsonconfig['UserBucket'] = bucket
-
         def clioption = [ jsonconfig ]
-        writeJSON(file: 'containers.json', json: clioption)
+        def json = JsonOutput.toJson(jsonconfig)
+        writeFile file: "containers.json", text: clioption
 
         // Kickoff job
         def xml = sh(
