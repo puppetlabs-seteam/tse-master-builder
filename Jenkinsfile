@@ -291,12 +291,12 @@ stage("Build and Test"){
               }
 
               stage ("Cleanup") {
-                // step([$class: 'WsCleanup'])
+                step([$class: 'WsCleanup'])
               }
 
             } catch (error) {
               stage("Failure Cleanup") {
-                // step([$class: 'WsCleanup'])
+                step([$class: 'WsCleanup'])
                 description = description + "Build ${config['builds'][index]} failed.  No artifacts for ${config['builds'][index]} uploaded."
 
                 //Cleanup any deployed artifacts
