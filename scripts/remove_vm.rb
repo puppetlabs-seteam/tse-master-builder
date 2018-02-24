@@ -5,17 +5,27 @@ vm_name    = ENV['vm_name']    || abort('VM Name not set [export vm_name=X]. Ful
 fog_config = ENV['fog_config'] || abort('Fog configuration not set [export fog_config=X]')
 datacenter = ENV['datacenter'] || abort('Datacenter not set [export datacenter=X]')
 
+require 'yaml'
+cnf = YAML::load(File.open('config.yml'))
+
 
 puts "VMName: #{vm_name}"
 puts "Fog Config: #{fog_config}"
 puts "Datacenter: #{datacenter}"
 
 
+
+
 begin
   file = File.open("/tmp/some_file", "w")
   file.write(vm_name)
+  file.write("\n")
   file.write(fog_config)
+  file.write("\n")
   file.write(datacenter)
+  file.write("\n")
+  file.write(cnf)
+  file.write("\n")
 rescue IOError => e
   puts e.message
 ensure
