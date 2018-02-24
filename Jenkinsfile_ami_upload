@@ -52,10 +52,11 @@ node ('tse-master-builder-vmware') {
         jsonconfig['Format'] = "ova"
         jsonconfig['UserBucket'] = bucket
 
-        def clioption = JsonOutput.toJson([jsonconfig])
+        def clioption = [ jsonconfig ]
+        def parsed = JsonOutput.toJson(parsed)
 
         // Kickoff job
-        def xml = sh(returnStdout: true, script: "aws ec2 import-image --cli-input-json ${clioption}")
+        def xml = sh(returnStdout: true, script: "aws ec2 import-image --cli-input-json ${parsed}")
         def ami_job = new XmlSlurper().parseText(xml).importTaskId
 
         //Get the new AMI id
