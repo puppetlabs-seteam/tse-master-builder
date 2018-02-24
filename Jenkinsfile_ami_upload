@@ -62,13 +62,13 @@ node {
           def ami_job = new XmlSlurper().parseText(xml).importTaskId
 
           //Get the new AMI id
-          def xml = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
-          def imageId = new XmlSlurper().parseText(xml).imageId
+          def xml1 = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
+          def imageId = new XmlSlurper().parseText(xml1).imageId
 
           //Wait for it to complete
           waitUntil {
-            def xml = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
-            def status = new XmlSlurper().parseText(xml).status
+            def xmlstatus = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
+            def status = new XmlSlurper().parseText(xmlstatus).status
 
             if (status == 'completed'){
               return true
