@@ -1,6 +1,8 @@
 #!groovy
 import org.yaml.snakeyaml.Yaml
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurperClassic
+
 config = [:]
 
 node ('tse-master-builder-vmware') {
