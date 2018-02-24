@@ -202,9 +202,7 @@ stage("Build and Test"){
                       eval "\$(rbenv init -)"
                       gem install bundler --version 1.10.6
                       bundle install
-                      datacenter="${VMWARE_DATACENTER}" fog_config=fog \
-                        vm_name="cs\-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" \
-                        bundle exec ruby scripts/remove_vm.rb
+                      datacenter="${VMWARE_DATACENTER}" fog_config=fog vm_name="cs-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" bundle exec ruby scripts/remove_vm.rb
                       rm -f fog
                     """)
 
@@ -311,9 +309,7 @@ stage("Build and Test"){
                     eval "\$(rbenv init -)"
                     gem install bundler --version 1.10.6
                     bundle install
-                    datacenter="${VMWARE_DATACENTER}" fog_config=fog \
-                      vm_name="cs\-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" \
-                      bundle exec ruby scripts/remove_vm.rb
+                    datacenter="${VMWARE_DATACENTER}" fog_config=fog vm_name="cs-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" bundle exec ruby scripts/remove_vm.rb
                     rm -f fog
                   """)
 
