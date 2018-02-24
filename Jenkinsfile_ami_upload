@@ -53,7 +53,7 @@ node ('tse-master-builder-vmware') {
         jsonconfig['UserBucket'] = bucket
         def clioption = [ jsonconfig ]
         def json = JsonOutput.toJson(jsonconfig)
-        writeFile file: "containers.json", text: clioption
+        writeFile file: "containers.json", text: json
 
         // Kickoff job
         def xml = sh(
