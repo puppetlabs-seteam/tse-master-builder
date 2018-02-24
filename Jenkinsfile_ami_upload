@@ -54,7 +54,7 @@ node ('tse-master-builder-vmware') {
         jsonconfig['Format'] = "ova"
         jsonconfig['UserBucket'] = bucket
 
-        def clioption = JsonOutput.toJson([test])
+        def clioption = JsonOutput.toJson([jsonconfig])
 
         // Kickoff job
         def xml = sh(returnStdout: true, script: "aws ec2 import-image --cli-input-json ${clioption}")
