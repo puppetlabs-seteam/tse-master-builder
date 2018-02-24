@@ -108,7 +108,7 @@ stage("Build and Test"){
                 ])
 
                  ansiColor('xterm') {
-                    throw "test error"
+                    throw error
 
                    // Virtualbox Build
                    if (config['builds'][index] == 'virtualbox') {
