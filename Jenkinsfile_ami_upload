@@ -65,7 +65,7 @@ node ('tse-master-builder-vmware') {
         def imageId = new XmlSlurper().parseText(xml1).imageId
 
         //Wait for it to complete
-        timeout(time: 2, unit: 'HOURS')
+        timeout(time: 2, unit: 'HOURS'){
           waitUntil {
             def xmlstatus = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
             def status = new XmlSlurper().parseText(xmlstatus).status
