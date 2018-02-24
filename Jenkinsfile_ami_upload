@@ -57,16 +57,20 @@ node ('tse-master-builder-vmware') {
       def ami_job = new JsonSlurperClassic().parseText(json1)['ImportTaskId']
 
       //Get the new AMI id
-      def json2 = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
+      def json2 = sh(returnStdout: true,
+                     script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job} --region us-west-2"
+                    )
 
       //Wait for it to complete
       timeout(time: 2, unit: 'HOURS'){
         waitUntil {
-          def xmlstatus = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
-          def status = new JsonSlurperClassic().parseText(json1)['ImportImageTasks'][0]['Status']
+          def json3 = sh(returnStdout: true,
+                         script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job} --region us-west-2"
+                        )
+          def status = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['Status']
 
           if (status == 'completed'){
-            imageId = new JsonSlurperClassic().parseText(json1)['ImportImageTasks'][0]['ImageId']
+            imageId = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['ImageId']
             return true
           } else {
             return false
