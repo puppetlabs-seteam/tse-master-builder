@@ -34,6 +34,7 @@ node ('tse-master-builder-vmware') {
     withEnv([
       "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin"
     ]) {
+      def imageId = ''
       def bucket = [:]
       bucket["S3Bucket"] = config['s3_bucket']
       bucket["S3Key"] = config['s3_key']
@@ -47,28 +48,28 @@ node ('tse-master-builder-vmware') {
       writeFile file: "containers.json", text: json
 
       // Kickoff job
-      def xml = sh(
+      def json1 = sh(
         returnStdout: true,
         script: "aws ec2 import-image --license-type BYOL  --disk-containers file://containers.json --region us-west-2"
       )
-      println(xml)
-      def ami_job = new XmlSlurper().parseText(xml.trim()).importTaskId
+      def ami_job = new JsonSlurperClassic().parseText(json1)['ImportTaskId']
 
       //Get the new AMI id
-      def xml1 = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
-      def imageId = new XmlSlurper().parseText(xml1.trim()).imageId
+      def json2 = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
 
       //Wait for it to complete
       timeout(time: 2, unit: 'HOURS'){
         waitUntil {
           def xmlstatus = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
-          def status = new XmlSlurper().parseText(xmlstatus).status
+          def status = new JsonSlurperClassic().parseText(json1)['ImportImageTasks'][0]['Status']
 
           if (status == 'completed'){
+            imageId = new JsonSlurperClassic().parseText(json1)['ImportImageTasks'][0]['ImageId']
             return true
           } else {
             return false
           }
+
         }
       }
 
