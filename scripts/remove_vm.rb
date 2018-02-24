@@ -5,6 +5,10 @@ vm_name    = ENV['vm_name']    || abort('VM Name not set [export vm_name=X]. Ful
 fog_config = ENV['fog_config'] || abort('Fog configuration not set [export fog_config=X]')
 datacenter = ENV['datacenter'] || abort('Datacenter not set [export datacenter=X]')
 
+puts "VMName: #{vm_name}"
+puts "Fog Config: #{fog_config}"
+puts "Datacenter: #{datacenter}"
+
 begin
   cfg = YAML.load_file(fog_config)
   vim = RbVmomi::VIM.connect  :host     => cfg[:default][:vsphere_server],
