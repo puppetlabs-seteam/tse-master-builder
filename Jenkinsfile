@@ -107,9 +107,6 @@ stage("Build and Test"){
                   userRemoteConfigs: [[url: 'https://github.com/ipcrm/ovfparser.git']]
                 ])
 
-                // Testing
-                throw error
-
                  ansiColor('xterm') {
 
                    // Virtualbox Build
