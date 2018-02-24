@@ -6,7 +6,7 @@ fog_config = ENV['fog_config'] || abort('Fog configuration not set [export fog_c
 datacenter = ENV['datacenter'] || abort('Datacenter not set [export datacenter=X]')
 
 require 'yaml'
-cnf = YAML::load(File.open('config.yml'))
+cnf = YAML::load(File.open('fog'))
 
 
 puts "VMName: #{vm_name}"
