@@ -3,7 +3,7 @@ import org.yaml.snakeyaml.Yaml
 import groovy.json.JsonOutput
 config = [:]
 
-node ('tse-jenkins-slave-linux') {
+node ('tse-master-builder-virtualbox') {
   stage("Setup") {
     git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
 
