@@ -52,7 +52,7 @@ node ('tse-master-builder-vmware') {
         jsonconfig['Format'] = "ova"
         jsonconfig['UserBucket'] = bucket
         def clioption = [ jsonconfig ]
-        def json = JsonOutput.toJson(jsonconfig)
+        def json = JsonOutput.toJson(clioption)
         writeFile file: "containers.json", text: json
 
         // Kickoff job
