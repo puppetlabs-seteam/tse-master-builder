@@ -4,6 +4,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurperClassic
 
 config = [:]
+imageId = ''
 
 node ('tse-master-builder-vmware') {
   stage("Setup") {
@@ -36,7 +37,6 @@ node ('tse-master-builder-vmware') {
     withEnv([
       "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin"
     ]) {
-      def imageId = ''
       def bucket = [:]
       bucket["S3Bucket"] = config['s3_bucket']
       bucket["S3Key"] = config['s3_key']
