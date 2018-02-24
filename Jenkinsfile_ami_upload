@@ -53,10 +53,13 @@ node ('tse-master-builder-vmware') {
         jsonconfig['UserBucket'] = bucket
 
         def clioption = [ jsonconfig ]
-        def parsed = JsonOutput.toJson(clioption)
+        writeJSON(file: 'containers.json', json: clioption)
 
         // Kickoff job
-        def xml = sh(returnStdout: true, script: "aws ec2 import-image --cli-input-json ${parsed}")
+        def xml = sh(
+          returnStdout: true,
+          script: "aws ec2 import-image --license-type BYOL  --disk-containers file://containers.json --region us-west-2"
+        )
         def ami_job = new XmlSlurper().parseText(xml).importTaskId
 
         //Get the new AMI id
