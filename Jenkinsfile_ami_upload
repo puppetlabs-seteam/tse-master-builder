@@ -73,7 +73,6 @@ node ('tse-master-builder-vmware') {
             imageId = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['ImageId']
             return true
           } else {
-            println("Sleeping for 5 minutes...")
             sleep 300
             return false
           }
