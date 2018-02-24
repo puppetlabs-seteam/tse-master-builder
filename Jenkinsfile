@@ -108,7 +108,6 @@ stage("Build and Test"){
                 ])
 
                  ansiColor('xterm') {
-                    throw error
 
                    // Virtualbox Build
                    if (config['builds'][index] == 'virtualbox') {
@@ -173,6 +172,7 @@ stage("Build and Test"){
                     sh(returnStatus: true, script:"""
                       cat $FOG_CONFIG > fog
                     """)
+                    throw error
 
                     // VMWare Build
                      sh(script:"""
@@ -203,7 +203,7 @@ stage("Build and Test"){
                       gem install bundler --version 1.10.6
                       bundle install
                       datacenter="${VMWARE_DATACENTER}" fog_config=fog \
-                        vm_name="cs-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" \
+                        vm_name="cs\-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" \
                         bundle exec ruby scripts/remove_vm.rb
                       rm -f fog
                     """)
@@ -312,7 +312,7 @@ stage("Build and Test"){
                     gem install bundler --version 1.10.6
                     bundle install
                     datacenter="${VMWARE_DATACENTER}" fog_config=fog \
-                      vm_name="cs-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" \
+                      vm_name="cs\-general/tse/home/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}" \
                       bundle exec ruby scripts/remove_vm.rb
                     rm -f fog
                   """)
