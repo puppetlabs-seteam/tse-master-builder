@@ -107,6 +107,9 @@ stage("Build and Test"){
                   userRemoteConfigs: [[url: 'https://github.com/ipcrm/ovfparser.git']]
                 ])
 
+                // Testing
+                throw error
+
                  ansiColor('xterm') {
 
                    // Virtualbox Build
@@ -172,7 +175,6 @@ stage("Build and Test"){
                     sh(returnStatus: true, script:"""
                       cat $FOG_CONFIG > fog
                     """)
-                    throw error
 
                     // VMWare Build
                      sh(script:"""
@@ -303,6 +305,11 @@ stage("Build and Test"){
                   sh(returnStatus: true, script:'vagrant box remove packer_virtualbox')
 
                 } else if (config['builds'][index] == 'vmware') {
+
+                  // VMWARE: Put Fog config in place
+                  sh(returnStatus: true, script:"""
+                    cat $FOG_CONFIG > fog
+                  """)
 
                   sh(returnStatus: true, script:"""
                     rbenv global 2.3.1
