@@ -31,62 +31,56 @@ node ('tse-master-builder-vmware') {
   }
 
   stage("Upload/Convert") {
-    withCredentials(
-      [
-        usernamePassword(credentialsId: 'puppetlabs-seteam-aws-cred', passwordVariable: 'aws_acckey', usernameVariable: 'aws_skey'),
-      ]
-    ){
-      withEnv([
-        "AWS_ACCESS_KEY_ID=${aws_acckey}",
-        "AWS_SECRET_ACCESS_KEY=${aws_skey}",
-        "AWS_DEFAULT_REGION=us-west-2",
-        "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin"
-      ]) {
+    withEnv([
+      "AWS_ACCESS_KEY_ID=${aws_acckey}",
+      "AWS_SECRET_ACCESS_KEY=${aws_skey}",
+      "AWS_DEFAULT_REGION=us-west-2",
+      "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin"
+    ]) {
 
-        def bucket = [:]
-        bucket["S3Bucket"] = config['s3_bucket']
-        bucket["S3Key"] = config['s3_key']
+      def bucket = [:]
+      bucket["S3Bucket"] = config['s3_bucket']
+      bucket["S3Key"] = config['s3_key']
 
-        def jsonconfig = [:]
-        jsonconfig['Description'] = "SE Demo Puppetmaster OVA"
-        jsonconfig['Format'] = "ova"
-        jsonconfig['UserBucket'] = bucket
-        def clioption = [ jsonconfig ]
-        def json = JsonOutput.toJson(clioption)
-        writeFile file: "containers.json", text: json
+      def jsonconfig = [:]
+      jsonconfig['Description'] = "SE Demo Puppetmaster OVA"
+      jsonconfig['Format'] = "ova"
+      jsonconfig['UserBucket'] = bucket
+      def clioption = [ jsonconfig ]
+      def json = JsonOutput.toJson(clioption)
+      writeFile file: "containers.json", text: json
 
-        // Kickoff job
-        def xml = sh(
-          returnStdout: true,
-          script: "aws ec2 import-image --license-type BYOL  --disk-containers file://containers.json --region us-west-2"
-        )
-        def ami_job = new XmlSlurper().parseText(xml).importTaskId
+      // Kickoff job
+      def xml = sh(
+        returnStdout: true,
+        script: "aws ec2 import-image --license-type BYOL  --disk-containers file://containers.json --region us-west-2"
+      )
+      def ami_job = new XmlSlurper().parseText(xml).importTaskId
 
-        //Get the new AMI id
-        def xml1 = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
-        def imageId = new XmlSlurper().parseText(xml1).imageId
+      //Get the new AMI id
+      def xml1 = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
+      def imageId = new XmlSlurper().parseText(xml1).imageId
 
-        //Wait for it to complete
-        timeout(time: 2, unit: 'HOURS'){
-          waitUntil {
-            def xmlstatus = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
-            def status = new XmlSlurper().parseText(xmlstatus).status
+      //Wait for it to complete
+      timeout(time: 2, unit: 'HOURS'){
+        waitUntil {
+          def xmlstatus = sh(returnStdout: true, script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job}")
+          def status = new XmlSlurper().parseText(xmlstatus).status
 
-            if (status == 'completed'){
-              return true
-            } else {
-              return false
-            }
+          if (status == 'completed'){
+            return true
+          } else {
+            return false
           }
         }
+      }
 
-        //Notify as long as imageId is set
-        if (!imageId?.trim()) {
-          emailext body: "New SE Demo Env AMI has been published!\n\nSource OVA: ${config['source_ova']}\n\nNew AMI: ${imageId}", subject: "[SE Demo Environment] - New AMI Released! (${imageID} from source ${config['source_ova']})", to: "${config['build_notice']}", replyTo: 'noreply@puppet.com'
-        } else {
-           println("FAIL: ImageId is not set - something went wrong!")
-           throw error
-        }
+      //Notify as long as imageId is set
+      if (!imageId?.trim()) {
+        emailext body: "New SE Demo Env AMI has been published!\n\nSource OVA: ${config['source_ova']}\n\nNew AMI: ${imageId}", subject: "[SE Demo Environment] - New AMI Released! (${imageID} from source ${config['source_ova']})", to: "${config['build_notice']}", replyTo: 'noreply@puppet.com'
+      } else {
+         println("FAIL: ImageId is not set - something went wrong!")
+         throw error
       }
     }
   }
