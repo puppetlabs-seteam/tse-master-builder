@@ -73,7 +73,7 @@ node ('tse-master-builder-vmware') {
             imageId = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['ImageId']
             sh("aws ec2 create-tags --resources ${imageId} --tags Key=Name,Value=${config['source_ova']} --region us-west-2")
 
-            emailext body: "New SE Demo Env AMI has been published!\n\nSource OVA: ${config['source_ova']}\n\nNew AMI: ${imageId}", subject: "[SE Demo Environment] - New AMI Released! (${imageID} from source ${config['source_ova']})", to: "${config['build_notice']}", replyTo: 'noreply@puppet.com'
+            emailext body: "New SE Demo Env AMI has been published!\n\nSource OVA: ${config['source_ova']}\n\nNew AMI: ${imageId}", subject: "[SE Demo Environment] - New AMI Released! (${imageId} from source ${config['source_ova']})", to: "${config['build_notice']}", replyTo: 'noreply@puppet.com'
 
             return true
           } else {
