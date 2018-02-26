@@ -348,10 +348,10 @@ currentBuild.description = description
 
 //Notify - Only on master, ie stable, tse-master-builder builds
 if (env.BUILD_BRANCH == 'master' &&  buildType == 'release') {
-  emailext(
+  emailext (
     to: "${config['build_notice']}",
     subject: "[SE Demo Environment] - New Release! (PE ${config['download_version']} @ ${config['build_version']})",
-    replyTo: 'noreply@puppet.com'
+    replyTo: 'noreply@puppet.com',
     body: """
       New Release has been published!  Version: PE ${config['download_version']} @ ${config['build_version']}
 
