@@ -102,18 +102,18 @@ node ('tse-master-builder-vmware') {
       emailext (
         to: "${config['build_notice']}",
         replyTo: 'noreply@puppet.com',
-        subject: "[SE Demo Environment] - New AMI Released! (${imageId} from source ${config['source_ova']})",
+        subject: "[SE Demo Environment] - New AMIs Released from source ${config['source_ova']}!",
         body:
           """
              New SE Demo Env AMI has been published!
 
              Source OVA: ${config['source_ova']}
              New AMIs:
-                us-west-2 (US): ${image_ids['us-west-2']}
-                eu-west-2 (London): ${image_ids['eu-west-2']}
-                eu-west-3 (Paris): ${image_ids['eu-west-3']}
-                eu-central-1 (Frankfurt): ${image_ids['eu-central-1']}
-                ap-southeast-2 (Sydney):  ${image_ids['ap-southeast-2']}
+                us-west-2 (US/Canada):      ${image_ids['us-west-2']}
+                eu-west-2 (London):         ${image_ids['eu-west-2']}
+                eu-west-3 (Paris):          ${image_ids['eu-west-3']}
+                eu-central-1 (Frankfurt):   ${image_ids['eu-central-1']}
+                ap-southeast-2 (Sydney):    ${image_ids['ap-southeast-2']}
                 ap-southeast-1 (Singapore): ${image_ids['ap-southeast-1']}
           """
       )
