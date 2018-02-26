@@ -360,7 +360,7 @@ if (env.BUILD_BRANCH == 'master' &&  buildType == 'release') {
 
       Note, an AMI Creation Job has been started (a second email notice will be sent once it completes).
 
-      Changes:\n${changelog}
+      Changes:\n\n${changelog}
     """
   )
 }
