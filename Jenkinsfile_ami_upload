@@ -81,7 +81,7 @@ node ('tse-master-builder-vmware') {
       }
 
       //Tag New Image
-      sh("aws ec2 create-tags --resources ${imageId} --tags Key=Name,Value=${config['source_ova']} --region us-west-2")
+      sh("aws ec2 create-tags --resources ${imageId} --region us-west-2 --tags Key=Name,Value=${config['source_ova']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
 
       //Copy to all required regions
       image_ids = [:]
@@ -95,6 +95,8 @@ node ('tse-master-builder-vmware') {
 
           def id = new JsonSlurperClassic().parseText(json)
           image_ids[it] = id
+
+          sh("aws ec2 create-tags --resources ${id} --region ${it} --tags Key=Name,Value=${config['source_ova']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
       }
 
       emailext (
