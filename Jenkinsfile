@@ -282,18 +282,18 @@ stage("Build and Test"){
                       userMetadata: []
                     ])
 
-                    // Launch job to convert ova to AMI(s)
-                    build job: 'se-master-builder-ami-upload', wait: false, parameters: [
-                      string(name: 'SOURCE_OVA', value: "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.ova" ),
-                      string(name: 'S3_BUCKET', value: 'tse-builds'),
-                      string(name: 'S3_KEY', value: "tse-demo-env/${target}/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.ova" ),
-                      string(name: 'BUILD_NOTICE', value: config['build_notice']),
-                      string(name: 'BUILD_BRANCH', value: env.BUILD_BRANCH )
-                    ]
+                    if (config['builds'][index] == 'vmware') {
+                      // Launch job to convert ova to AMI(s)
+                      build job: 'se-master-builder-ami-upload', wait: false, parameters: [
+                        string(name: 'SOURCE_OVA', value: "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.ova" ),
+                        string(name: 'S3_BUCKET', value: 'tse-builds'),
+                        string(name: 'S3_KEY', value: "tse-demo-env/${target}/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.ova" ),
+                        string(name: 'BUILD_NOTICE', value: config['build_notice']),
+                        string(name: 'BUILD_BRANCH', value: env.BUILD_BRANCH )
+                      ]
+                    }
                   }
-
                 }
-
               }
 
               stage ("Cleanup") {
