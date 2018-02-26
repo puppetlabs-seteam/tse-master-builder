@@ -87,16 +87,18 @@ node ('tse-master-builder-vmware') {
       image_ids = [:]
       image_ids['us-west-2'] = imageId
 
-      ['eu-west-2','eu-west-3','eu-central-1','ap-southeast-2','ap-southeast-1'].each {
-          def j = sh(
-            returnStdout: true,
-            script: "aws ec2 copy-image --source-image-id ${imageId} --source-region us-west-2 --region ${it} --name ${config['source_ova']}"
-          )
+      regions = ['eu-west-2','eu-west-3','eu-central-1','ap-southeast-2','ap-southeast-1']
+      for ( int i = 0; i < regions.size(); i++ ) {
+        def cur_reg = regions[i]
+        def j = sh(
+          returnStdout: true,
+          script: "aws ec2 copy-image --source-image-id ${imageId} --source-region us-west-2 --region ${cur_reg} --name ${config['source_ova']}"
+        )
 
-          def id = new JsonSlurperClassic().parseText(j)
-          image_ids[it] = id
+        def id = new JsonSlurperClassic().parseText(j)
+        image_ids[cur_reg] = id
 
-          sh("aws ec2 create-tags --resources ${id} --region ${it} --tags Key=Name,Value=${config['source_ova']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
+        sh("aws ec2 create-tags --resources ${id} --region ${cur_reg} --tags Key=Name,Value=${config['source_ova']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
       }
 
       emailext (
