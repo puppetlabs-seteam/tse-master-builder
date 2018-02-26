@@ -88,12 +88,12 @@ node ('tse-master-builder-vmware') {
       image_ids['us-west-2'] = imageId
 
       ['eu-west-2','eu-west-3','eu-central-1','ap-southeast-2','ap-southeast-1'].each {
-          def json = sh(
+          def j = sh(
             returnStdout: true,
             script: "aws ec2 copy-image --source-image-id ${imageId} --source-region us-west-2 --region ${it} --name ${config['source_ova']}"
           )
 
-          def id = new JsonSlurperClassic().parseText(json)
+          def id = new JsonSlurperClassic().parseText(j)
           image_ids[it] = id
 
           sh("aws ec2 create-tags --resources ${id} --region ${it} --tags Key=Name,Value=${config['source_ova']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
