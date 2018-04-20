@@ -5,8 +5,6 @@ describe 'Validate Services' do
     [
       'puppet',
       'pe-puppetserver',
-      'pe-activemq',
-      'mcollective',
       'pe-puppetdb',
       'pe-postgresql',
       'pe-console-services',

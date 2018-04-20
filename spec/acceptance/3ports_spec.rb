@@ -7,7 +7,6 @@ describe 'Validate Ports' do
       8140,
       8142,
       8143,
-      61613,
       4433,
       443,
     ].each do |p|
