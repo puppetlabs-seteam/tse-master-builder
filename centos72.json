@@ -25,18 +25,18 @@
       "shutdown_command": "echo 'puppetlabs'|sudo -S /sbin/halt -h -p",
       "headless": true,
       "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--memory", "8192"],
-        ["modifyvm", "{{.Name}}", "--cpus", "4"]
+        ["modifyvm", "{{.Name}}", "--memory", "4096"],
+        ["modifyvm", "{{.Name}}", "--cpus", "2"]
       ],
       "export_opts":
         [
           "--vsys", "0",
-          "--product", "Puppet Enterprise {{ user `DOWNLOAD_VERSION` }} (TSE Demo Master)",
+          "--product", "Puppet Enterprise {{ user `DOWNLOAD_VERSION` }} (HOL Demo Master)",
           "--producturl", "www.puppet.com",
           "--vendor", "Puppet, Inc",
           "--vendorurl", "www.puppet.com",
           "--version", "{{ user `BUILD_VER`}}",
-          "--description", "Puppet Enterprise TSE Master"
+          "--description", "Puppet Enterprise HOL Master"
         ]
       }
   ],
