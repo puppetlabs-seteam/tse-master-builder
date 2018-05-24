@@ -99,8 +99,7 @@ TEXT
 function setup_git {
   # set up gitea
   /opt/puppetlabs/bin/puppet module install kogitoapp-gitea --version 1.0.4
-  cat > /tmp/git.pp << FILE
-  $secret_key = 'mysecretkey'
+  cat > /tmp/git.pp << 'FILE'
   class { 'gitea':
       package_ensure         => 'present',
       dependencies_ensure    => 'present',
@@ -175,7 +174,7 @@ function setup_git {
         'webhook'    => {
           'SKIP_TLS_VERIFY' => true,
         },
-      }   
+      }
   }
 
 FILE
