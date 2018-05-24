@@ -97,6 +97,7 @@ TEXT
 }
 
 function setup_git {
+  # set up gitea
   /opt/puppetlabs/bin/puppet module install kogitoapp-gitea --version 1.0.4
   cat > /tmp/git.pp << FILE
   class { 'gitea':
