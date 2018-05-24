@@ -97,81 +97,42 @@ TEXT
 }
 
 function setup_git {
-  /opt/puppetlabs/bin/puppet module install kschu91-gogs --version 1.1.0
+  /opt/puppetlabs/bin/puppet module install kogitoapp-gitea --version 1.0.4
   cat > /tmp/git.pp << FILE
-class {'gogs':
-  app_ini          => {
-    'APP_NAME' => 'TSE Demo Master Git Server',
-    'RUN_USER' => 'git',
-    'RUN_MODE' => 'prod',
-  },
-  app_ini_sections => {
-    'server'     => {
-      'DOMAIN'           => $::fqdn,
-      'HTTP_PORT'        => 3000,
-      'ROOT_URL'         => "https://$(hostname -f)/",
-      'HTTP_ADDR'        => '0.0.0.0',
-      'DISABLE_SSH'      => false,
-      'SSH_PORT'         => '22',
-      'START_SSH_SERVER' => false,
-      'OFFLINE_MODE'     => false,
-    },
-    'database'   => {
-      'DB_TYPE'  => 'sqlite3',
-      'HOST'     => '127.0.0.1:3306',
-      'NAME'     => 'gogs',
-      'USER'     => 'root',
-      'PASSWD'   => '',
-      'SSL_MODE' => 'disable',
-      'PATH'     => '/opt/gogs/data/gogs.db',
-    },
-    'security'   => {
-      'SECRET_KEY'   => 'thesecretkey',
-      'INSTALL_LOCK' => true,
-    },
-    'service'    => {
-      'REGISTER_EMAIL_CONFIRM' => false,
-      'ENABLE_NOTIFY_MAIL'     => false,
-      'DISABLE_REGISTRATION'   => false,
-      'ENABLE_CAPTCHA'         => true,
-      'REQUIRE_SIGNIN_VIEW'    => false,
-    },
-    'repository' => {
-      'ROOT'     => '/var/git',
-    },
-    'mailer'     => {
-      'ENABLED' => false,
-    },
-    'picture'    => {
-      'DISABLE_GRAVATAR'        => false,
-      'ENABLE_FEDERATED_AVATAR' => true,
-    },
-    'session'    => {
-      'PROVIDER' => 'file',
-    },
-    'log'        => {
-      'MODE'      => 'file',
-      'LEVEL'     => 'info',
-      'ROOT_PATH' => '/opt/gogs/log',
-    },
-    'webhook'    => {
-      'SKIP_TLS_VERIFY' => true,
-    },
-  },
-  manage_user      => true,
-}
+  class { 'gitea':
+      package_ensure         => 'present',
+      dependencies_ensure    => 'present',
+      dependencies           => ['curl', 'git', 'tar'],
+      manage_user            => true,
+      manage_group           => true,
+      manage_home            => true,
+      owner                  => 'git',
+      group                  => 'git',
+      home                   => '/home/git',
+      version                => '1.4.1',
+      installation_directory => '/opt/gitea',
+      repository_root        => '/var/git',
+      log_directory          => '/var/log/gitea',
+      attachment_directory   => '/opt/gitea/data/attachments',
+      configuration_sections => {},
+      manage_service         => true,
+      service_template       => 'gitea/systemd.erb',
+      service_path           => '/lib/systemd/system/gitea.service',
+      service_provider       => 'systemd',
+      service_mode           => '0644',
+  }
 
 FILE
 
   /opt/puppetlabs/bin/puppet apply /tmp/git.pp
 
   cd /tmp
-  sudo -u git /opt/gogs/gogs admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
+  sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
 
   echo "{\"clone_addr\": \"${GIT_REMOTE}\", \"uid\": 1, \"repo_name\": \"control-repo\"}" > repo.data
   curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
   if [ $? -ne 0 ]; then
-    echo "Gogs: Failed to create control-repo"
+    echo "gitea: Failed to create control-repo"
     exit 5
   fi
 
@@ -179,7 +140,7 @@ FILE
   echo "{\"title\":\"puppet master key\",\"key\":\""${PUB_KEY}"\"}" > input.data
   curl -H 'Content-Type: application/json' -X POST -d @input.data http://puppet:puppetlabs@localhost:3000/api/v1/admin/users/puppet/keys
   if [ $? -ne 0 ]; then
-    echo "Gogs: Failed to create public key"
+    echo "gitea: Failed to create public key"
     exit 6
   fi
 
@@ -274,8 +235,8 @@ function guest_additions {
   rmdir /media/VBoxGuestAdditions
 }
 
-function add_gogs_webhook {
-  echo "{\"type\":\"gogs\",\"config\":\
+function add_gitea_webhook {
+  echo "{\"type\":\"gitea\",\"config\":\
     {\"url\":\"https://localhost:8170/code-manager/v1/webhook?type=github&token=$(cat /root/.puppetlabs/token)\",\"content_type\":\"json\"},\
     \"events\":[\"push\"],\"active\":true}" > hook.data
   curl -H 'Content-Type: application/json' -X POST -d @hook.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/puppet/control-repo/hooks
@@ -365,7 +326,7 @@ setup_hiera_pe
 run_puppet
 run_puppet
 run_puppet
-add_gogs_webhook
+add_gitea_webhook
 cleanup
 free_disk_space
 
