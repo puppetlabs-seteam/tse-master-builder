@@ -12,6 +12,7 @@ function setup_prereqs {
   hostnamectl set-hostname master.inf.puppet.vm
 #  echo '127.0.0.1  localhost master.inf.puppet.vm master' > /etc/hosts
   sed -i ' 1 s/.*/& master.inf.puppet.vm master/' /etc/hosts
+  cat /etc/hosts
   echo 'nameserver 8.8.8.8' > /etc/resolv.conf
   yum clean all
 }
@@ -189,7 +190,7 @@ FILE
   sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
 
   echo "{\"clone_addr\": \"${GIT_REMOTE}\", \"uid\": 1, \"repo_name\": \"control-repo\"}" > repo.data
-  curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@127.0.0.1:3000/api/v1/repos/migrate
+  curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
   if [ $? -ne 0 ]; then
     echo "gitea: Failed to create control-repo"
     exit 5
@@ -197,7 +198,7 @@ FILE
 
   PUB_KEY=$(cat /etc/puppetlabs/puppetserver/ssh/id-control_repo.rsa.pub)
   echo "{\"title\":\"puppet master key\",\"key\":\""${PUB_KEY}"\"}" > input.data
-  curl -H 'Content-Type: application/json' -X POST -d @input.data http://puppet:puppetlabs@127.0.0.1:3000/api/v1/admin/users/puppet/keys
+  curl -H 'Content-Type: application/json' -X POST -d @input.data http://puppet:puppetlabs@localhost:3000/api/v1/admin/users/puppet/keys
   if [ $? -ne 0 ]; then
     echo "gitea: Failed to create public key"
     exit 6
