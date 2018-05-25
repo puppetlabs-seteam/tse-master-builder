@@ -166,6 +166,9 @@ function setup_git {
         'session'    => {
           'PROVIDER' => 'file',
         },
+        'indexer'    => {
+          'REPO_INDEXER_ENABLED' => true,
+        },        
         'log'        => {
           'MODE'      => 'file',
           'LEVEL'     => 'info',
