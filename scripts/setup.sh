@@ -187,15 +187,31 @@ FILE
   /opt/puppetlabs/bin/puppet apply /tmp/git.pp
 
   cd /tmp
-  echo "Create user"  
+  sleep 5
   sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
-  while [ $? -ne 0 ]; do
-    echo "Attempting to create user again"
-    sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
+  for i in 1 2 3 4 5
+  do
+    if [ $? -ne 0 ]; then
+      echo "Attempting to create user again $i"
+      sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
+    fi  
   done
+
+  if [ $? -ne 0 ]; then
+    echo "gitea: Puppet user wasn't created."
+    exit 7
+  fi  
 
   echo "{\"clone_addr\": \"${GIT_REMOTE}\", \"uid\": 1, \"repo_name\": \"control-repo\"}" > repo.data
   curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
+  for i in 1 2 3 4 5
+  do
+    if [ $? -ne 0 ]; then
+      echo "Attempting to migrate repos again $i"
+      curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
+    fi  
+  done
+
   if [ $? -ne 0 ]; then
     echo "gitea: Failed to create control-repo"
     exit 5
