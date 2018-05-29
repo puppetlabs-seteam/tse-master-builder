@@ -187,8 +187,10 @@ FILE
   /opt/puppetlabs/bin/puppet apply /tmp/git.pp
 
   cd /tmp
+  echo "Create user"  
+  sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
   while [ $? -ne 0 ]; do
-    echo "Creating user"
+    echo "Attempting to create user again"
     sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
   done
 
