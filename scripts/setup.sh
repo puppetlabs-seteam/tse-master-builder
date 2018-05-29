@@ -195,7 +195,7 @@ FILE
   done
 
   if [ $? -ne 0 ]; then
-    echo "gitea: Puppet user wasn't created."
+    echo "gitea: Puppet user wasnt created."
     exit 7
   fi  
 
