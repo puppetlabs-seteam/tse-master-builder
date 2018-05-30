@@ -1,5 +1,7 @@
 #!/bin/bash
 set -x
+#DEBUG
+env
 
 if [ -z $1 ]; then
   echo "MUST PASS BUILDER, virtualbox-ovf or vmware-vmx! Exiting..."
