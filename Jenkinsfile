@@ -82,6 +82,12 @@ stage("Build and Test"){
           download_version_dash = config['download_version'].replace('.','')
           git_current = gitCurrent.replace('.','-')
 
+          //DEBUG
+          print "GITHUB USERNAME"
+          print $github_user_name
+          print "GITHUB TOKEN"
+          print $github_user_token
+
           withEnv([
             'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
             "GIT_REMOTE=${config['git_remote']}",
