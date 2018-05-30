@@ -25,12 +25,6 @@ BUILD_VER="${GIT_VERSION}"
 VMX_SOURCE_URL='https://atlas.hashicorp.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.0/providers/vmware_fusion.box'
 OVF_SOURCE_URL='https://atlas.hashicorp.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.1/providers/virtualbox.box'
 GIT_REMOTE="${GIT_REMOTE}"
-GITHUB_USER_NAME="${github_user_name}"
-GITHUB_USER_TOKEN="${github_user_token}"
-
-echo "GITHUB Stuff"
-echo $GITHUB_USER_NAME
-echo $GITHUB_USER_TOKEN
 
 # Setup VMX for import
 if [ ! -f '/var/tmp/vmware_fusion/import.vmx' ]; then
@@ -107,8 +101,8 @@ packer build \
   -parallel=false \
   -var "GIT_VERSION=$GIT_VERSION" \
   -var "GIT_REMOTE=$GIT_REMOTE" \
-  -var "GITHUB_USER_NAME=$GITHUB_USER_NAME" \
-  -var "GITHUB_USER_TOKEN=$GITHUB_USER_TOKEN" \
+  -var "GITHUB_USER_NAME=$github_user_name" \
+  -var "GITHUB_USER_TOKEN=$github_user_token" \
   -var "LIC_KEY=$LIC_KEY" \
   -var "BUILD_VER=$BUILD_VER" \
   -var "DOWNLOAD_VERSION=$DOWNLOAD_VERSION" \
