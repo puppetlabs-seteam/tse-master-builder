@@ -25,8 +25,8 @@ BUILD_VER="${GIT_VERSION}"
 VMX_SOURCE_URL='https://atlas.hashicorp.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.0/providers/vmware_fusion.box'
 OVF_SOURCE_URL='https://atlas.hashicorp.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.1/providers/virtualbox.box'
 GIT_REMOTE="${GIT_REMOTE}"
-GITHUB_USER_NAME="${GITHUB_USER_NAME}"
-GITHUB_USER_TOKEN="${GITHUB_USER_TOKEN}"
+GITHUB_USER_NAME="${github_user_name}"
+GITHUB_USER_TOKEN="${github_user_token}"
 
 echo "GITHUB Stuff"
 echo $GITHUB_USER_NAME
