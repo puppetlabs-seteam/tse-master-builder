@@ -26,6 +26,10 @@ GIT_REMOTE="${GIT_REMOTE}"
 GITHUB_USER_NAME="${GITHUB_USER_NAME}"
 GITHUB_USER_TOKEN="${GITHUB_USER_TOKEN}"
 
+echo "GITHUB Stuff"
+echo $GITHUB_USER_NAME
+echo $GITHUB_USER_TOKEN
+
 # Setup VMX for import
 if [ ! -f '/var/tmp/vmware_fusion/import.vmx' ]; then
 
