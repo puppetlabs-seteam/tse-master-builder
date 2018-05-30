@@ -54,7 +54,9 @@
         "DOWNLOAD_DIST={{ user `DOWNLOAD_DIST` }}",
         "DOWNLOAD_RELEASE={{ user `DOWNLOAD_RELEASE` }}",
         "DOWNLOAD_ARCH={{ user `DOWNLOAD_ARCH`}}",
-        "DOWNLOAD_RC={{ user `DOWNLOAD_RC`}}"
+        "DOWNLOAD_RC={{ user `DOWNLOAD_RC`}}",
+        "GITHUB_USER_NAME={{ user `GITHUB_USER_NAME`}}",
+        "GITHUB_USER_TOKEN={{ user `GITHUB_USER_TOKEN`}}"
       ],
       "execute_command": "echo 'puppetlabs' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'"
     }
