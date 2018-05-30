@@ -37,7 +37,7 @@ stage("Setup") {
 
     // Determine if this is a tagged version, or just a commit (this gets read from the control-repo)
     dir ('control-repo') {
-      git branch: 'production', changelog: false, poll: false, url: env.GIT_REMOTE, credentialsId: 'hol-master-builder-jenkins'
+      git branch: 'production', changelog: false, poll: false, url: env.GIT_REMOTE, credentialsId: '27a9faf6-db7e-48b3-9fd5-fe2579714c37'
       sh("git reset --hard ${config['build_version']}")
       def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
       def gitVersion = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
