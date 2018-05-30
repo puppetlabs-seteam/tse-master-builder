@@ -84,9 +84,9 @@ stage("Build and Test"){
 
           //DEBUG
           print "GITHUB USERNAME"
-          print $github_user_name
+          print "${github_user_name}"
           print "GITHUB TOKEN"
-          print $github_user_token
+          print "${github_user_token}"
 
           withEnv([
             'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
