@@ -64,11 +64,7 @@ stage("Build and Test"){
             file(credentialsId: 'puppetlabs-seteam-license_key', variable: 'license_key'),
             file(credentialsId: 'puppetlabs-seteam-openstack-script', variable: 'openstack_script'),
             usernamePassword(credentialsId: 'vsphere_userpass', passwordVariable: 'vmware_pass', usernameVariable: 'vmware_user'),
-            usernamePassword(
-              credentialsId: 'hol-master-builder-github-creds',
-              passwordVariable: 'github_user_name',
-              usernameVariable: 'github_user_pass'
-            ),
+            usernamePassword(credentialsId: 'hol-master-builder-github-creds', passwordVariable: 'github_user_name', usernameVariable: 'github_user_pass'),
             string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
             string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
           ]
