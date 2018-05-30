@@ -10,7 +10,7 @@ def description = ''
 stage("Setup") {
   node {
 
-    git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
+    git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git', credentialsId: 'hol-master-builder-github-creds'
 
     // Store build configuration in config var (map)
     // keys: download_version (string), ga_release=(bool), pe_dist=(string), pe_release=(int), pe_arch=(string)
@@ -64,6 +64,11 @@ stage("Build and Test"){
             file(credentialsId: 'puppetlabs-seteam-license_key', variable: 'license_key'),
             file(credentialsId: 'puppetlabs-seteam-openstack-script', variable: 'openstack_script'),
             usernamePassword(credentialsId: 'vsphere_userpass', passwordVariable: 'vmware_pass', usernameVariable: 'vmware_user'),
+            usernamePassword(
+              credentialsId: 'hol-master-builder-github-creds',
+              passwordVariable: 'github_user_name',
+              usernameVariable: 'github_user_pass'
+            ),
             string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
             string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
           ]
@@ -77,6 +82,8 @@ stage("Build and Test"){
           withEnv([
             'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
             "GIT_REMOTE=${config['git_remote']}",
+            "GITHUB_USER_NAME=${github_user_name}",
+            "GITHUB_USER_TOKEN=${github_user_token}",
             "DOWNLOAD_VERSION=${config['download_version']}",
             "DWNLD_VER=${download_version_dash}",
             "DOWNLOAD_DIST=${config['pe_dist']}",
