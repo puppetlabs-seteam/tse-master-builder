@@ -10,7 +10,7 @@ def description = ''
 stage("Setup") {
   node {
 
-    git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git', credentialsId: 'hol-master-builder-github-creds'
+    git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
 
     // Store build configuration in config var (map)
     // keys: download_version (string), ga_release=(bool), pe_dist=(string), pe_release=(int), pe_arch=(string)
@@ -37,7 +37,7 @@ stage("Setup") {
 
     // Determine if this is a tagged version, or just a commit (this gets read from the control-repo)
     dir ('control-repo') {
-      git branch: 'production', changelog: false, poll: false, url: env.GIT_REMOTE
+      git branch: 'production', changelog: false, poll: false, url: env.GIT_REMOTE, credentialsId: 'hol-master-builder-github-creds'
       sh("git reset --hard ${config['build_version']}")
       def gitTag =  sh(returnStdout: true, script: 'git describe --exact-match --tags HEAD 2>/dev/null || exit 0').trim()
       def gitVersion = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
