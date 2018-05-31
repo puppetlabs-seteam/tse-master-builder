@@ -68,10 +68,6 @@ stage("Build and Test"){
               passwordVariable: 'vmware_pass',
               usernameVariable: 'vmware_user'
             ),
-            usernamePassword(credentialsId: 'hol-master-builder-github-creds',
-              passwordVariable: 'github_user_name',
-              usernameVariable: 'github_user_token'
-            ),
             string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
             string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
           ]
@@ -82,17 +78,13 @@ stage("Build and Test"){
           download_version_dash = config['download_version'].replace('.','')
           git_current = gitCurrent.replace('.','-')
 
-          //DEBUG
-          print "GITHUB USERNAME"
-          print "${github_user_name}"
-          print "GITHUB TOKEN"
-          print "${github_user_token}"
-
           withEnv([
             'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
             "GIT_REMOTE=${config['git_remote']}",
-            'GITHUB_USER_NAME=$github_user_name',
-            'GITHUB_USER_TOKEN=$github_user_token',
+            usernamePassword(credentialsId: 'hol-master-builder-github-creds',
+              passwordVariable: 'GITHUB_USER_NAME',
+              usernameVariable: 'GITHUB_USER_TOKEN'
+            ),
             "DOWNLOAD_VERSION=${config['download_version']}",
             "DWNLD_VER=${download_version_dash}",
             "DOWNLOAD_DIST=${config['pe_dist']}",
