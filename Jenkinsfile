@@ -91,8 +91,8 @@ stage("Build and Test"){
           withEnv([
             'PATH+EXTRA=/usr/local/bin:/Users/jenkins/.rbenv/bin',
             "GIT_REMOTE=${config['git_remote']}",
-            "GITHUB_USER_NAME=${github_user_name}",
-            "GITHUB_USER_TOKEN=${github_user_token}",
+            'GITHUB_USER_NAME=$github_user_name',
+            'GITHUB_USER_TOKEN=$github_user_token',
             "DOWNLOAD_VERSION=${config['download_version']}",
             "DWNLD_VER=${download_version_dash}",
             "DOWNLOAD_DIST=${config['pe_dist']}",
