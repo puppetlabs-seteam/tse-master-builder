@@ -1,4 +1,8 @@
 {
+ "variables": {
+    "GITHUB_USER_NAME": "{{ env `GITHUB_USER_NAME`}}",
+    "GITHUB_USER_TOKEN": "{{ env `GITHUB_USER_TOKEN`}}"
+  },
   "builders": [
     {
       "type": "vmware-vmx",
@@ -55,8 +59,8 @@
         "DOWNLOAD_RELEASE={{ user `DOWNLOAD_RELEASE` }}",
         "DOWNLOAD_ARCH={{ user `DOWNLOAD_ARCH`}}",
         "DOWNLOAD_RC={{ user `DOWNLOAD_RC`}}",
-        "GITHUB_USER_NAME={{ env `GITHUB_USER_NAME`}}",
-        "GITHUB_USER_TOKEN={{ env `GITHUB_USER_TOKEN`}}"
+        "GITHUB_USER_NAME={{ user `GITHUB_USER_NAME`}}",
+        "GITHUB_USER_TOKEN={{ user `GITHUB_USER_TOKEN`}}"
       ],
       "execute_command": "echo 'puppetlabs' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'"
     }
