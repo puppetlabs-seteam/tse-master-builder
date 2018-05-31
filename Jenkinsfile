@@ -68,10 +68,6 @@ stage("Build and Test"){
               passwordVariable: 'vmware_pass',
               usernameVariable: 'vmware_user'
             ),
-            usernamePassword(credentialsId: 'hol-master-builder-github-creds',
-              passwordVariable: 'GITHUB_USER_NAME',
-              usernameVariable: 'GITHUB_USER_TOKEN'
-            ),
             string(credentialsId: 'puppetlabs-seteam-vmware-vi-string', variable: 'vmware_vi_connection'),
             string(credentialsId: 'puppetlabs-seteam-vmware-datacenter', variable: 'vmware_datacenter'),
           ]
@@ -108,6 +104,8 @@ stage("Build and Test"){
             "VMWARE_NET=${config['vmware_network']}",
             "VMWARE_VI_CONNECTION=${vmware_vi_connection}",
             "VMWARE_DATACENTER=${vmware_datacenter}",
+            "GITHUB_USER_NAME=${env.GITHUB_USER_NAME}",
+            "GITHUB_USER_TOKEN=${env.GITHUB_USER_TOKEN}",
           ]){
             try {
               stage ("Build tse-master-${config['builds'][index]}") {
