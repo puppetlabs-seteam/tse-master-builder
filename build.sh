@@ -1,6 +1,9 @@
 #!/bin/bash
 set -x
 #DEBUG
+GITHUB_USER_NAME=${CREDENTIALS%:*}
+GITHUB_USER_TOKEN=${CREDENTIALS#*:}
+
 env
 
 if [ -z $1 ]; then
@@ -101,8 +104,8 @@ packer build \
   -parallel=false \
   -var "GIT_VERSION=$GIT_VERSION" \
   -var "GIT_REMOTE=$GIT_REMOTE" \
-  -var "GITHUB_USER_NAME=$github_user_name" \
-  -var "GITHUB_USER_TOKEN=$github_user_token" \
+  -var "GITHUB_USER_NAME=$GITHUB_USER_NAME" \
+  -var "GITHUB_USER_TOKEN=$GITHUB_USER_TOKEN" \
   -var "LIC_KEY=$LIC_KEY" \
   -var "BUILD_VER=$BUILD_VER" \
   -var "DOWNLOAD_VERSION=$DOWNLOAD_VERSION" \
