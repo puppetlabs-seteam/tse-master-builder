@@ -168,10 +168,6 @@ FILE
   cd /tmp
   sudo -u git /opt/gogs/gogs admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
 
-  # DEBUG
-  echo "${GITHUB_USER_NAME} ${GITHUB_USER_TOKEN}" > /tmp/semfile
-  cat /tmp/semfile
-
   echo "{\"auth_username\":\"${GITHUB_USER_NAME}\",\"auth_password\":\"${GITHUB_USER_TOKEN}\",\"clone_addr\": \"${GIT_REMOTE}\", \"uid\": 1, \"repo_name\": \"control-repo\"}" > repo.data
   curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
   if [ $? -ne 0 ]; then
