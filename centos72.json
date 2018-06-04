@@ -29,7 +29,7 @@
       "shutdown_command": "echo 'puppetlabs'|sudo -S /sbin/halt -h -p",
       "headless": true,
       "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--memory", "4096"],
+        ["modifyvm", "{{.Name}}", "--memory", "4604"],
         ["modifyvm", "{{.Name}}", "--cpus", "2"]
       ],
       "export_opts":
