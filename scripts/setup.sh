@@ -10,8 +10,8 @@ function setup_prereqs {
   yum -y install open-vm-tools
 
   hostnamectl set-hostname master.inf.puppet.vm
-#  echo '127.0.0.1  localhost master.inf.puppet.vm master' > /etc/hosts
-  sed -i ' 1 s/.*/& master.inf.puppet.vm master/' /etc/hosts
+  echo '127.0.0.1  master.inf.puppet.vm master' > /etc/hosts
+#  sed -i ' 1 s/.*/& master.inf.puppet.vm master/' /etc/hosts
   cat /etc/hosts
   echo 'nameserver 8.8.8.8' > /etc/resolv.conf
   yum clean all
