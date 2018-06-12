@@ -11,7 +11,6 @@ function setup_prereqs {
 
   hostnamectl set-hostname master.inf.puppet.vm
   echo '127.0.0.1  master.inf.puppet.vm master' > /etc/hosts
-#  sed -i ' 1 s/.*/& master.inf.puppet.vm master/' /etc/hosts
   cat /etc/hosts
   echo 'nameserver 8.8.8.8' > /etc/resolv.conf
   yum clean all
@@ -189,9 +188,12 @@ FILE
   cd /tmp
   sleep 5
   sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
-  while [ $? -ne 0 ]; do
-    echo "Attempting to create user again"
-    sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
+  for i in 1 2 3 4 5
+  do
+    if [ $? -ne 0 ]; then
+      echo "Attempting to create user again $i"
+      sudo -u git /opt/gitea/gitea admin create-user --name=puppet --password=puppetlabs --email='puppet@localhost.local' --admin=true
+    fi  
   done
 
   if [ $? -ne 0 ]; then
@@ -201,9 +203,13 @@ FILE
 
   echo "{\"clone_addr\": \"${GIT_REMOTE}\", \"uid\": 1, \"repo_name\": \"control-repo\"}" > repo.data
   curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
-  while [ $? -ne 0 ]; do
-    echo "Attempting to migrate repos"
-    curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
+
+  for j in 1 2 3 4 5
+  do
+    if [ $? -ne 0 ]; then
+      echo "Attempting to migrate repos again $j"
+      curl -H 'Content-Type: application/json' -X POST -d @repo.data http://puppet:puppetlabs@localhost:3000/api/v1/repos/migrate
+    fi  
   done
 
   if [ $? -ne 0 ]; then
