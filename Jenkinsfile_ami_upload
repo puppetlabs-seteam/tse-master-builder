@@ -102,7 +102,7 @@ node ('tse-master-builder-vmware') {
         
         // Add launch permission from the TSE account to the new AMI
         def launch_permission = '{"Add":[{"UserId":"221643363539"}]}'
-        sh("aws ec2 modify-image-attribute --image-id ${id} --launch-permission ${launch_permission}")
+        sh("aws ec2 modify-image-attribute --image-id ${id} --region ${cur_reg} --launch-permission ${launch_permission}")
       }
 
       emailext (
