@@ -101,7 +101,7 @@ node ('tse-master-builder-vmware') {
         sh("aws ec2 create-tags --resources ${id} --region ${cur_reg} --tags Key=Name,Value=${config['source_ova']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
         
         // Add launch permission from the TSE account to the new AMI
-        def launch_permission = '{"Add":[{"UserId":"221643363539"}]}'
+        def launch_permission = "{\"Add\":[{\"UserId\":\"221643363539\"}]}"
         sh("aws ec2 modify-image-attribute --image-id ${id} --region ${cur_reg} --launch-permission ${launch_permission}")
       }
 
