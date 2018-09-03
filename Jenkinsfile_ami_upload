@@ -116,7 +116,7 @@ node ('tse-master-builder-vmware') {
 
              Source OVA: ${config['source_ova']}
              New AMIs:
-                us-east-1 (East Coast):     ${image_ids['us-east-1']}
+                us-east-1 (US East Coast):  ${image_ids['us-east-1']}
                 us-west-2 (US/Canada):      ${image_ids['us-west-2']}
                 eu-west-2 (London):         ${image_ids['eu-west-2']}
                 eu-west-3 (Paris):          ${image_ids['eu-west-3']}
