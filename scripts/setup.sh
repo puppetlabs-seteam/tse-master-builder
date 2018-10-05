@@ -61,7 +61,7 @@ function install_pe {
   echo "${LIC_KEY}" > /etc/puppetlabs/license.key
   cat > /etc/puppetlabs/puppet/csr_attributes.yaml << YAML
   extension_requests:
-      pp_role:  master_server
+      pp_role:  seteam_puppet_master
 YAML
   cat > /tmp/pe.conf << FILE
 "console_admin_password": "puppetlabs"
