@@ -42,98 +42,104 @@ node ('tse-master-builder-vmware') {
   }
 
   stage("Upload/Convert") {
-    withEnv([
-      "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin"
-    ]) {
-      def bucket = [:]
-      bucket["S3Bucket"] = config['s3_bucket']
-      bucket["S3Key"] = config['s3_key']
+    withCredentials([ 
+      usernamePassword(credentialsId: 'puppetlabs-seteam-aws-cred', passwordVariable: 'aws_secret_key', usernameVariable: 'aws_key_id') 
+    ]{
+      withEnv([
+        "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin"
+        "AWS_DEFAULT_REGION=eu-west-2"
+        "AWS_ACCESS_KEY_ID=${aws_key_id}"
+        "AWS_SECRET_ACCESS_KEY=${aws_secret_key}"
+      ]) {
+        def bucket = [:]
+        bucket["S3Bucket"] = config['s3_bucket']
+        bucket["S3Key"] = config['s3_key']
 
-      def jsonconfig = [:]
-      jsonconfig['Description'] = "SE Demo Puppetmaster Image"
-      jsonconfig['Format'] = config['source_image_format']
-      jsonconfig['UserBucket'] = bucket
-      def clioption = [ jsonconfig ]
-      def json = JsonOutput.toJson(clioption)
-      writeFile file: "containers.json", text: json
+        def jsonconfig = [:]
+        jsonconfig['Description'] = "SE Demo Puppetmaster Image"
+        jsonconfig['Format'] = config['source_image_format']
+        jsonconfig['UserBucket'] = bucket
+        def clioption = [ jsonconfig ]
+        def json = JsonOutput.toJson(clioption)
+        writeFile file: "containers.json", text: json
 
-      // Kickoff job
-      def json1 = sh(
-        returnStdout: true,
-        script: "aws ec2 import-image --license-type BYOL  --disk-containers file://containers.json --region us-west-2"
-      )
-      def ami_job = new JsonSlurperClassic().parseText(json1)['ImportTaskId']
-
-      //Get the new AMI id
-      def json2 = sh(returnStdout: true,
-                     script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job} --region us-west-2"
-                    )
-
-      //Wait for it to complete
-      timeout(time: 2, unit: 'HOURS'){
-        waitUntil {
-          def json3 = sh(returnStdout: true,
-                         script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job} --region us-west-2"
-                        )
-          def status = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['Status']
-
-          if (status == 'completed'){
-            imageId = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['ImageId']
-            return true
-          } else {
-            sleep 300
-            return false
-          }
-
-        }
-      }
-
-      //Tag New Image
-      sh("aws ec2 create-tags --resources ${imageId} --region us-west-2 --tags Key=Name,Value=${config['source_image']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
-
-      //Copy to all required regions
-      image_ids = [:]
-      image_ids['us-west-2'] = imageId
-
-      regions = ['us-east-1', 'eu-west-2','eu-west-3','eu-central-1','ap-southeast-2','ap-southeast-1']
-      for ( int i = 0; i < regions.size(); i++ ) {
-        def cur_reg = regions[i]
-        def j = sh(
+        // Kickoff job
+        def json1 = sh(
           returnStdout: true,
-          script: "aws ec2 copy-image --source-image-id ${imageId} --source-region us-west-2 --region ${cur_reg} --name ${config['source_image']}"
+          script: "aws ec2 import-image --license-type BYOL  --disk-containers file://containers.json --region us-west-2"
         )
+        def ami_job = new JsonSlurperClassic().parseText(json1)['ImportTaskId']
 
-        def id = new JsonSlurperClassic().parseText(j)['ImageId']
-        image_ids[cur_reg] = id
+        //Get the new AMI id
+        def json2 = sh(returnStdout: true,
+                      script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job} --region us-west-2"
+                      )
 
-        sh("aws ec2 create-tags --resources ${id} --region ${cur_reg} --tags Key=Name,Value=${config['source_image']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
-        
-        // Add launch permission from the TSE account to the new AMI
-        // We need to wait until the image is available before applying the launch permission
-        def launch_permission = '{\\"Add\\":[{\\"UserId\\":\\"221643363539\\"}]}'
-        sh("aws ec2 wait image-available --image-ids ${id} && aws ec2 modify-image-attribute --image-id ${id} --region ${cur_reg} --launch-permission ${launch_permission}")
+        //Wait for it to complete
+        timeout(time: 2, unit: 'HOURS'){
+          waitUntil {
+            def json3 = sh(returnStdout: true,
+                          script: "aws ec2 describe-import-image-tasks --import-task-ids ${ami_job} --region us-west-2"
+                          )
+            def status = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['Status']
+
+            if (status == 'completed'){
+              imageId = new JsonSlurperClassic().parseText(json3)['ImportImageTasks'][0]['ImageId']
+              return true
+            } else {
+              sleep 300
+              return false
+            }
+
+          }
+        }
+
+        //Tag New Image
+        sh("aws ec2 create-tags --resources ${imageId} --region us-west-2 --tags Key=Name,Value=${config['source_image']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
+
+        //Copy to all required regions
+        image_ids = [:]
+        image_ids['us-west-2'] = imageId
+
+        regions = ['us-east-1', 'eu-west-2','eu-west-3','eu-central-1','ap-southeast-2','ap-southeast-1']
+        for ( int i = 0; i < regions.size(); i++ ) {
+          def cur_reg = regions[i]
+          def j = sh(
+            returnStdout: true,
+            script: "aws ec2 copy-image --source-image-id ${imageId} --source-region us-west-2 --region ${cur_reg} --name ${config['source_image']}"
+          )
+
+          def id = new JsonSlurperClassic().parseText(j)['ImageId']
+          image_ids[cur_reg] = id
+
+          sh("aws ec2 create-tags --resources ${id} --region ${cur_reg} --tags Key=Name,Value=${config['source_image']} Key=created_by,Value=tse_jenkins Key=department,Value=tse Key=project,Value=tse-demo-env")
+          
+          // Add launch permission from the TSE account to the new AMI
+          // We need to wait until the image is available before applying the launch permission
+          def launch_permission = '{\\"Add\\":[{\\"UserId\\":\\"221643363539\\"}]}'
+          sh("aws ec2 wait image-available --image-ids ${id} && aws ec2 modify-image-attribute --image-id ${id} --region ${cur_reg} --launch-permission ${launch_permission}")
+        }
+
+        emailext (
+          to: "${config['build_notice']}",
+          replyTo: 'noreply@puppet.com',
+          subject: "[SE Demo Environment] - New AMIs Released from source ${config['source_image']}!",
+          body:
+            """
+              New SE Demo Env AMI has been published!
+
+              Source Image: ${config['source_image']}
+              New AMIs:
+                  us-east-1 (US East Coast):  ${image_ids['us-east-1']}
+                  us-west-2 (US/Canada):      ${image_ids['us-west-2']}
+                  eu-west-2 (London):         ${image_ids['eu-west-2']}
+                  eu-west-3 (Paris):          ${image_ids['eu-west-3']}
+                  eu-central-1 (Frankfurt):   ${image_ids['eu-central-1']}
+                  ap-southeast-2 (Sydney):    ${image_ids['ap-southeast-2']}
+                  ap-southeast-1 (Singapore): ${image_ids['ap-southeast-1']}
+            """
+        )
       }
-
-      emailext (
-        to: "${config['build_notice']}",
-        replyTo: 'noreply@puppet.com',
-        subject: "[SE Demo Environment] - New AMIs Released from source ${config['source_image']}!",
-        body:
-          """
-             New SE Demo Env AMI has been published!
-
-             Source Image: ${config['source_image']}
-             New AMIs:
-                us-east-1 (US East Coast):  ${image_ids['us-east-1']}
-                us-west-2 (US/Canada):      ${image_ids['us-west-2']}
-                eu-west-2 (London):         ${image_ids['eu-west-2']}
-                eu-west-3 (Paris):          ${image_ids['eu-west-3']}
-                eu-central-1 (Frankfurt):   ${image_ids['eu-central-1']}
-                ap-southeast-2 (Sydney):    ${image_ids['ap-southeast-2']}
-                ap-southeast-1 (Singapore): ${image_ids['ap-southeast-1']}
-          """
-      )
-
     }
   }
 }
