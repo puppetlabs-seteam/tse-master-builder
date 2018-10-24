@@ -278,7 +278,7 @@ stage("Build and Test"){
                           sourceFile: '*/*.box',
                           storageClass: 'STANDARD',
                           uploadFromSlave: false,
-                          useServerSideEncryption: false]
+                          useServerSideEncryption: false
                       ],
                       [
                           bucket: 'tse-builds/tse-demo-env',
@@ -293,7 +293,7 @@ stage("Build and Test"){
                           sourceFile: '*/*.vmdk',
                           storageClass: 'STANDARD',
                           uploadFromSlave: false,
-                          useServerSideEncryption: false]
+                          useServerSideEncryption: false
                       ],
                       pluginFailureResultConstraint: 'FAILURE',
                       profileName: 'tse-jenkins',
