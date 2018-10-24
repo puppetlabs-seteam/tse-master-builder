@@ -44,7 +44,7 @@ node ('tse-master-builder-vmware') {
   stage("Upload/Convert") {
     withCredentials([ 
       usernamePassword(credentialsId: 'puppetlabs-seteam-aws-cred', passwordVariable: 'aws_secret_key', usernameVariable: 'aws_key_id') 
-    ]{
+    ]){
       withEnv([
         "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin",
         "AWS_DEFAULT_REGION=eu-west-2",
