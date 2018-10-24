@@ -10,6 +10,9 @@ node ('tse-master-builder-vmware') {
   stage("Setup") {
     git branch: env.BUILD_BRANCH, changelog: false, poll: false, url: 'https://github.com/puppetlabs-seteam/tse-master-builder.git'
 
+    string(credentialsId: 'puppetlabs-seteam-aws-cred	', variable: 'aws_credentials')
+    print "AWS creds: ${aws_credentials}"
+    
     config['source_image'] = env.SOURCE_IMAGE
     config['source_image_format'] = env.SOURCE_IMAGE_FORMAT
     config['s3_bucket'] = env.S3_BUCKET
