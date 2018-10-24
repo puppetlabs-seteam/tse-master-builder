@@ -294,7 +294,7 @@ stage("Build and Test"){
                           storageClass: 'STANDARD',
                           uploadFromSlave: false,
                           useServerSideEncryption: false
-                      ],
+                      ]],
                       pluginFailureResultConstraint: 'FAILURE',
                       profileName: 'tse-jenkins',
                       userMetadata: []
