@@ -119,27 +119,27 @@ node ('tse-master-builder-vmware') {
           def launch_permission = '{\\"Add\\":[{\\"UserId\\":\\"221643363539\\"}]}'
           sh("aws ec2 wait image-available --image-ids ${id} && aws ec2 modify-image-attribute --image-id ${id} --region ${cur_reg} --launch-permission ${launch_permission}")
         }
-
-        emailext (
-          to: "${config['build_notice']}",
-          replyTo: 'noreply@puppet.com',
-          subject: "[SE Demo Environment] - New AMIs Released from source ${config['source_image']}!",
-          body:
-            """
-              New SE Demo Env AMI has been published!
-
-              Source Image: ${config['source_image']}
-              New AMIs:
-                  us-east-1 (US East Coast):  ${image_ids['us-east-1']}
-                  us-west-2 (US/Canada):      ${image_ids['us-west-2']}
-                  eu-west-2 (London):         ${image_ids['eu-west-2']}
-                  eu-west-3 (Paris):          ${image_ids['eu-west-3']}
-                  eu-central-1 (Frankfurt):   ${image_ids['eu-central-1']}
-                  ap-southeast-2 (Sydney):    ${image_ids['ap-southeast-2']}
-                  ap-southeast-1 (Singapore): ${image_ids['ap-southeast-1']}
-            """
-        )
       }
+      
+      emailext (
+        to: "${config['build_notice']}",
+        replyTo: 'noreply@puppet.com',
+        subject: "[SE Demo Environment] - New AMIs Released from source ${config['source_image']}!",
+        body:
+          """
+            New SE Demo Env AMI has been published!
+
+            Source Image: ${config['source_image']}
+            New AMIs:
+                us-east-1 (US East Coast):  ${image_ids['us-east-1']}
+                us-west-2 (US/Canada):      ${image_ids['us-west-2']}
+                eu-west-2 (London):         ${image_ids['eu-west-2']}
+                eu-west-3 (Paris):          ${image_ids['eu-west-3']}
+                eu-central-1 (Frankfurt):   ${image_ids['eu-central-1']}
+                ap-southeast-2 (Sydney):    ${image_ids['ap-southeast-2']}
+                ap-southeast-1 (Singapore): ${image_ids['ap-southeast-1']}
+          """
+      )
     }
   }
 }
