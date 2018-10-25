@@ -114,7 +114,10 @@ node ('tse-master-builder-vmware') {
           // Add launch permission from the TSE account to the new AMI
           // We need to wait until the image is available before applying the launch permission
           def launch_permission = '{\\"Add\\":[{\\"UserId\\":\\"221643363539\\"}]}'
-          sh("aws ec2 wait image-available --image-ids ${id} && aws ec2 modify-image-attribute --image-id ${id} --region ${cur_reg} --launch-permission ${launch_permission}")
+          def j2 = sh(
+            returnStdout: true,
+            script: "aws ec2 wait image-available --image-ids ${id} --region ${cur_reg} && aws ec2 modify-image-attribute --image-id ${id} --region ${cur_reg} --launch-permission ${launch_permission}"
+          )
         }
       
         emailext (

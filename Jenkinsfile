@@ -223,7 +223,7 @@ stage("Build and Test"){
                 }
 
                 // Move the vmdk file
-                sh "mv output-virtualbox-ovf/*.vmdk ${target}/tse-master-${DWNLD_VER}-v${GIT_CUR}.vmdk"
+                sh "mv output-virtualbox-ovf/*.vmdk ${target}/tse-master-virtualbox-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.vmdk"
  
                 // Move Archive
                 sh "find . -name \"*.box\" -o -name \"*.ova\" | xargs -I {} mv {} ${target}/"
@@ -303,10 +303,10 @@ stage("Build and Test"){
                     if (config['builds'][index] == 'virtualbox') {
                       // Launch job to convert vmdk to AMI(s)
                       build job: 'se-master-builder-ami-upload', wait: false, parameters: [
-                        string(name: 'SOURCE_IMAGE', value: "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.vmdk" ),
+                        string(name: 'SOURCE_IMAGE', value: "tse-master-virtualbox-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.vmdk" ),
                         string(name: 'SOURCE_IMAGE_FORMAT', value: "vmdk" ),
                         string(name: 'S3_BUCKET', value: 'tse-builds'),
-                        string(name: 'S3_KEY', value: "tse-demo-env/${target}/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.vmdk" ),
+                        string(name: 'S3_KEY', value: "tse-demo-env/${target}/tse-master-virtualbox-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.vmdk" ),
                         string(name: 'BUILD_NOTICE', value: config['build_notice']),
                         string(name: 'BUILD_BRANCH', value: env.BUILD_BRANCH )
                       ]
