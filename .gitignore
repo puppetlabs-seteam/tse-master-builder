@@ -4,3 +4,4 @@ Gemfile.lock
 junit
 log
 .vagrant
+vendor/*

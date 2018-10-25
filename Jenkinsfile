@@ -222,6 +222,9 @@ stage("Build and Test"){
                   target = 'releases'
                 }
 
+                // Move the vmdk file
+                sh "mv output-virtualbox-ovf/*.vmdk ${target}/tse-master-virtualbox-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.vmdk"
+ 
                 // Move Archive
                 sh "find . -name \"*.box\" -o -name \"*.ova\" | xargs -I {} mv {} ${target}/"
 
@@ -235,7 +238,7 @@ stage("Build and Test"){
 
                       openstack image create \
                         --disk-format vmdk \
-                        --file output-virtualbox-ovf/*.vmdk \
+                        --file ${target}/*.vmdk \
                         "tse-master-${DWNLD_VER}-v${GIT_CUR}"
                     """)
                   }
@@ -275,19 +278,35 @@ stage("Build and Test"){
                           sourceFile: '*/*.box',
                           storageClass: 'STANDARD',
                           uploadFromSlave: false,
-                          useServerSideEncryption: false]
+                          useServerSideEncryption: false
                       ],
+                      [
+                          bucket: 'tse-builds/tse-demo-env',
+                          excludedFile: '',
+                          flatten: false,
+                          gzipFiles: false,
+                          keepForever: true,
+                          managedArtifacts: false,
+                          noUploadOnFailure: true,
+                          selectedRegion: 'us-west-2',
+                          showDirectlyInBrowser: false,
+                          sourceFile: '*/*.vmdk',
+                          storageClass: 'STANDARD',
+                          uploadFromSlave: false,
+                          useServerSideEncryption: false
+                      ]],
                       pluginFailureResultConstraint: 'FAILURE',
                       profileName: 'tse-jenkins',
                       userMetadata: []
                     ])
 
-                    if (config['builds'][index] == 'vmware') {
-                      // Launch job to convert ova to AMI(s)
+                    if (config['builds'][index] == 'virtualbox') {
+                      // Launch job to convert vmdk to AMI(s)
                       build job: 'se-master-builder-ami-upload', wait: false, parameters: [
-                        string(name: 'SOURCE_OVA', value: "tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.ova" ),
+                        string(name: 'SOURCE_IMAGE', value: "tse-master-virtualbox-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.vmdk" ),
+                        string(name: 'SOURCE_IMAGE_FORMAT', value: "vmdk" ),
                         string(name: 'S3_BUCKET', value: 'tse-builds'),
-                        string(name: 'S3_KEY', value: "tse-demo-env/${target}/tse-master-vmware-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.ova" ),
+                        string(name: 'S3_KEY', value: "tse-demo-env/${target}/tse-master-virtualbox-${DOWNLOAD_VERSION}-v${GIT_CURRENT}.vmdk" ),
                         string(name: 'BUILD_NOTICE', value: config['build_notice']),
                         string(name: 'BUILD_BRANCH', value: env.BUILD_BRANCH )
                       ]

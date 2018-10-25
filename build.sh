@@ -20,8 +20,8 @@ DOWNLOAD_RELEASE="${DOWNLOAD_RELEASE}"
 DOWNLOAD_ARCH="${DOWNLOAD_ARCH}"
 DOWNLOAD_RC="${DOWNLOAD_RC}"
 BUILD_VER="${GIT_VERSION}"
-VMX_SOURCE_URL='https://atlas.hashicorp.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.0/providers/vmware_fusion.box'
-OVF_SOURCE_URL='https://atlas.hashicorp.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.1/providers/virtualbox.box'
+VMX_SOURCE_URL='https://app.vagrantup.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.0/providers/vmware_fusion.box'
+OVF_SOURCE_URL='https://app.vagrantup.com/puppetlabs/boxes/centos-7.2-64-nocm/versions/1.0.1/providers/virtualbox.box'
 GIT_REMOTE="${GIT_REMOTE}"
 
 # Setup VMX for import
