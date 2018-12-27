@@ -392,7 +392,7 @@ setup_users
 generate_keys
 
 if [ "$PACKER_BUILDER_TYPE" = "virtualbox-ovf" ]; then
-  vagrant_setup
+#  vagrant_setup
   guest_additions
 fi
 
