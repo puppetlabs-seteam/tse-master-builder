@@ -7,7 +7,7 @@ function setup_prereqs {
   yum -y install wget
   mkdir -p /etc/puppetlabs/puppetserver/ssh/
   mkdir -p /etc/puppetlabs/puppet
-  yum -y install open-vm-tools
+  yum -y install open-vm-tools cloud-init
 
   hostnamectl set-hostname master.inf.puppet.vm
   echo '127.0.0.1  master.inf.puppet.vm master' > /etc/hosts
