@@ -98,7 +98,7 @@ node ('tse-master-builder-vmware') {
         image_ids = [:]
         image_ids['us-west-2'] = imageId
 
-        regions = ['us-east-1', 'eu-west-2','eu-west-3','eu-central-1','ap-southeast-2','ap-southeast-1']
+        regions = ['us-east-1', 'us-east-2', 'eu-west-2','eu-west-3','eu-central-1','ap-southeast-2','ap-southeast-1']
         for ( int i = 0; i < regions.size(); i++ ) {
           def cur_reg = regions[i]
           def j = sh(
